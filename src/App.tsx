@@ -15,8 +15,10 @@ import SafetyValuesSection from "@/sections/SafetyValuesSection";
 import FooterSection from "@/sections/FooterSection";
 import FloatingNavButton from "@/components/common/FloatingNavButton";
 import PrivacyConsentModal from "@/components/common/PrivacyConsentModal";
+import ProductModal from "@/components/curated/ProductModal";
 
 import type { AnalysisResults } from "@/types";
+import type { Product } from "@/data/productData";
 
 export default function App() {
   // 인터뷰 결과를 저장할 상태
@@ -27,6 +29,9 @@ export default function App() {
   
   // 개인정보 동의 및 세션 상태 관리
   const [hasConsented, setHasConsented] = useState<boolean>(false);
+
+  // 모달 관리를 위한 전역 상태
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     // 앱 로드 시 기존 동의 여부 및 세션 확인
@@ -84,7 +89,10 @@ export default function App() {
           />
           
           {/* 분석 리포트 섹션: 인터뷰 결과에 따른 개인화된 분석 결과 */}
-          <InsightReportSection results={analysisResults} />
+          <InsightReportSection 
+            results={analysisResults} 
+            onProductClick={setSelectedProduct}
+          />
           
           {/* 안전성 섹션: 제품의 원료 및 안전성 강조 */}
           <SafetyValuesSection />
@@ -96,6 +104,17 @@ export default function App() {
         {/* 플로팅 내비게이션 버튼 (클릭: 이전 섹션 / 더블클릭: 맨 위로) */}
         <FloatingNavButton />
       </div>
+
+      {/* 
+        제품 상세 모달 (루트 레벨)
+        컨텐츠 블러의 영향을 받지 않도록 외부에 배치
+      */}
+      {selectedProduct && (
+        <ProductModal 
+          product={selectedProduct} 
+          onClose={() => setSelectedProduct(null)} 
+        />
+      )}
     </div>
   );
 }

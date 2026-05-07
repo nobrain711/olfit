@@ -45,8 +45,13 @@ export function getRecommendedProducts(results: AnalysisResults | null): (Produc
     const maxPossibleScore = (selectedNotes.length * 2) + 1.5;
     const rawSimilarity = maxPossibleScore > 0 ? (score / maxPossibleScore) * 100 : 70;
     
-    // 60-99% 사이로 정규화
-    const similarity = Math.min(Math.round(rawSimilarity * 0.3 + 65), 99);
+    // 제품 ID를 기반으로 한 고정된 랜덤값 (결과가 바뀔 때마다 변하지 않게 함)
+    const stableRandom = (product.id % 10) / 10; // 0.0 ~ 0.9
+
+    // 65-98% 사이로 정규화 및 변별력 확보
+    // rawSimilarity(0~100) -> 0.3 곱해서 범위를 0~30으로 좁힘
+    // stableRandom을 더해 제품마다 미세한 차이(0.1~0.9)를 줌
+    const similarity = Math.min(Math.round(rawSimilarity * 0.3 + 65 + stableRandom), 98);
     
     return { ...product, similarity };
   });

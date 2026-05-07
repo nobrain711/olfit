@@ -7,21 +7,24 @@
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import RadarChart from "@/components/common/RadarChart";
 import ProductCarousel from "@/components/report/ProductCarousel";
-import ProductModal from "@/components/curated/ProductModal";
 import { radarData } from "@/data/reportData";
 import { getRecommendedProducts } from "@/data/recommendationEngine";
 import { Download } from "lucide-react";
 import html2canvas from "html2canvas";
-import { useRef, useMemo, useState } from "react";
+import { useRef, useMemo } from "react";
 import type { AnalysisResults } from "@/types";
 import type { Product } from "@/data/productData";
 
-export default function InsightReportSection({ results }: { results: AnalysisResults | null }) {
+interface InsightReportSectionProps {
+  results: AnalysisResults | null;
+  onProductClick: (product: Product) => void;
+}
+
+export default function InsightReportSection({ results, onProductClick }: InsightReportSectionProps) {
   const { ref: ref1, isVisible: vis1 } = useIntersectionObserver();
   const { ref: ref2, isVisible: vis2 } = useIntersectionObserver();
   const { ref: ref3, isVisible: vis3 } = useIntersectionObserver();
   const reportRef = useRef<HTMLDivElement>(null);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   // 다이내믹 데이터 계산
   const recommendations = useMemo(() => getRecommendedProducts(results), [results]);
@@ -142,20 +145,13 @@ export default function InsightReportSection({ results }: { results: AnalysisRes
 
                 <ProductCarousel 
                   products={recommendations} 
-                  onProductClick={setSelectedProduct} 
+                  onProductClick={onProductClick} 
                 />
               </div>
             </div>
           </>
         )}
       </div>
-
-      {selectedProduct && (
-        <ProductModal 
-          product={selectedProduct} 
-          onClose={() => setSelectedProduct(null)} 
-        />
-      )}
     </section>
   );
 }
