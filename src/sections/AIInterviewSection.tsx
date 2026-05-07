@@ -22,11 +22,13 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
   const [progress, setProgress] = useState(0);
   
   // 분석 단계 시나리오 (30초 동안 순차적 노출)
-  const steps = [
+  const getSteps = () => [
     { threshold: 10, text: "이미지 픽셀 데이터 추출 중..." },
     { threshold: 30, text: "스타일 실루엣 및 텍스처 분석..." },
     { threshold: 50, text: "색채 심리학 기반 무드 매칭..." },
-    { threshold: 70, text: "선택하신 향기 노트와 스타일 결합 중..." },
+    { threshold: 70, text: selectedNotes.length > 0 
+        ? `선택하신 ${selectedNotes.length}개의 노트와 스타일 결합 중...` 
+        : "이미지 무드 기반 향기 매칭 집중 분석 중..." },
     { threshold: 90, text: "최적의 향기 아우라 생성 완료" },
   ];
 
@@ -37,6 +39,7 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
     setIsAnalyzing(true);
     setProgress(0);
     
+    const analysisSteps = getSteps();
     // 30초 동안 프로그레스 바 및 상태 업데이트
     const duration = 30000; // 30 seconds
     const interval = 100;
@@ -47,7 +50,7 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
         const next = prev + step;
         
         // 현재 퍼센트에 맞는 텍스트 업데이트
-        const currentStep = steps.find(s => next <= s.threshold) || steps[steps.length - 1];
+        const currentStep = analysisSteps.find(s => next <= s.threshold) || analysisSteps[analysisSteps.length - 1];
         setAnalysisStatus(currentStep.text);
 
         if (next >= 100) {
@@ -87,6 +90,22 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
               업로드하신 사진과 선택하신 원료를 기반으로 Olfit AI가 <br className="hidden sm:inline" /> 
               당신만의 고유한 향기 아우라를 정교하게 분석합니다.
             </p>
+
+            {!isComplete && !isAnalyzing && selectedNotes.length === 0 && (
+              <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 bg-cream/5 border border-cream/10 rounded-full animate-pulse">
+                <span className="text-[10px] text-cream/60 uppercase tracking-widest font-medium">
+                  ⚠️ 향기 취향을 선택하지 않으셨습니다. 이미지 무드 위주로 분석이 진행됩니다.
+                </span>
+              </div>
+            )}
+            
+            {!isComplete && !isAnalyzing && selectedNotes.length > 0 && (
+              <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 bg-cream/10 border border-cream/20 rounded-full">
+                <span className="text-[10px] text-cream/80 uppercase tracking-widest font-medium">
+                  Ready with {selectedNotes.length} notes: {selectedNotes.join(", ")}
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="max-w-2xl mx-auto">

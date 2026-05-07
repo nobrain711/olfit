@@ -34,16 +34,21 @@ export function getRecommendedProducts(results: AnalysisResults | null): (Produc
       }
     });
 
-    // 2. 패밀리 매칭 (기본 가중치 1)
-    // 분석된 무드에 따른 추천 패밀리 (간소화된 로직)
+    // 2. 패밀리 매칭 (기본 가중치 1.5)
     const mood = results.personalMood || "";
     if (mood.includes("시크") && (product.family === "우디" || product.family === "머스크")) score += 1.5;
     if (mood.includes("로맨틱") && product.family === "플로랄") score += 1.5;
+    if (mood.includes("상쾌") && (product.family === "시트러스" || product.family === "프레쉬")) score += 1.5;
 
-    // 점수를 0-100 사이의 유사도 퍼센트로 변환 (최대 점수 8점 가정)
-    const similarity = Math.min(Math.round((score / 8) * 100), 99);
+    // 점수를 0-100 사이의 유사도 퍼센트로 변환
+    // 선택된 노트 개수에 따라 최대 점수(Max Score) 유동적 계산
+    const maxPossibleScore = (selectedNotes.length * 2) + 1.5;
+    const rawSimilarity = maxPossibleScore > 0 ? (score / maxPossibleScore) * 100 : 70;
     
-    return { ...product, similarity: similarity > 0 ? similarity : Math.floor(Math.random() * 20) + 60 }; // 최소 60% 보정
+    // 60-99% 사이로 정규화
+    const similarity = Math.min(Math.round(rawSimilarity * 0.3 + 65), 99);
+    
+    return { ...product, similarity };
   });
 
   // 유사도 순으로 정렬하여 상위 5개 반환

@@ -46,8 +46,13 @@ export default function NoteGlossary({ onNotesChange }: NoteGlossaryProps) {
             03. Perfumery Notes (향기 원료 사전)
           </h3>
           <p className="text-sm text-wood/60 break-keep">
-            마음에 드는 <span className="text-wood font-medium">3가지 원료</span>를 선택해 보세요. 당신의 스타일 사진과 함께 분석하여 가장 닮은 향수를 찾아드립니다.
+            마음에 드는 <span className="text-wood font-medium">원료를 최대 3개</span>까지 선택해 보세요. 당신의 스타일 사진과 함께 분석하여 가장 닮은 향수를 찾아드립니다.
           </p>
+          {selectedNotes.length === 0 && (
+            <p className="text-[10px] text-wood/30 mt-2 italic">
+              * 선택하지 않으셔도 분석이 가능하지만, 취향이 반영되지 않을 수 있습니다.
+            </p>
+          )}
         </div>
         
         <div className="flex items-center gap-4">
