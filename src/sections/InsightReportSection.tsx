@@ -275,12 +275,13 @@ export default function InsightReportSection({ results }: { results: AnalysisRes
                         <p className="text-[14px] leading-relaxed text-cream/70 mb-8 break-keep">
                           당신의 공간에서 느껴지는 {results.spaceColor}과 {results.spaceTexture}의 질감, 그리고 {results.spaceLight}은 
                           심리적인 안정감과 지적인 평온함을 동시에 제공합니다. <br/><br/>
-                          이 공간에는 선택하신 무드가 어우러진 향기가 
-                          마치 공기 중에 빛이 부서지는 듯한 느낌을 완성해 줄 것입니다.
+                          이 공간의 공기를 정화하고 깊은 명상의 분위기를 완성하기 위해, 
+                          전통적인 수제 기법으로 빚어낸 **나그참파 인센스 스틱**을 제안합니다. 
+                          피어오르는 연기와 함께 당신의 공간은 더욱 신성하고 아늑한 안식처가 될 것입니다.
                         </p>
                         <div className="pt-6 border-t border-cream/10">
                           <p className="text-[10px] uppercase tracking-widest text-cream/40 mb-2 text-cream">Recommended Category</p>
-                          <p className="text-sm font-medium text-cream">Object Candle & Large Diffuser</p>
+                          <p className="text-sm font-medium text-cream">Nag Champa Incense Stick</p>
                         </div>
                       </div>
                     </div>
