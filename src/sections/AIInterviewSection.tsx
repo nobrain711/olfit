@@ -19,7 +19,7 @@ type Message = {
 
 export default function AIInterviewSection({ onComplete }: { onComplete?: (results: AnalysisResults) => void }) {
   const { ref, isVisible } = useIntersectionObserver();
-  const [activeTrack, setActiveTrack] = useState<null | "personal" | "space">(null);
+  const [activeTrack, setActiveTrack] = useState<null | "personal">(null);
   const [userAnswers, setUserAnswers] = useState<string[]>([]);
   const [messages, setMessages] = useState<Message[]>([
     { id: "1", sender: "ai", text: interviewFlows.start.ai, options: interviewFlows.start.options },
@@ -29,8 +29,8 @@ export default function AIInterviewSection({ onComplete }: { onComplete?: (resul
   const [freeInput, setFreeInput] = useState("");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
-  const totalSteps = activeTrack ? interviewFlows[activeTrack].length : 1;
-  const progress = activeTrack 
+  const totalSteps = activeTrack === "personal" ? interviewFlows.personal.length : 1;
+  const progress = activeTrack === "personal" 
     ? Math.min(((currentStep + 1) / totalSteps) * 100, 100)
     : 0;
 
@@ -56,15 +56,15 @@ export default function AIInterviewSection({ onComplete }: { onComplete?: (resul
         const nextAi: Message = {
           id: crypto.randomUUID(),
           sender: "ai",
-          text: interviewFlows[track][0].ai,
-          options: interviewFlows[track][0].options,
+          text: interviewFlows.personal[0].ai,
+          options: interviewFlows.personal[0].options,
         };
         setMessages((prev) => [...prev, nextAi]);
       } else {
         const updatedAnswers = [...userAnswers, option];
         setUserAnswers(updatedAnswers);
         const nextStep = currentStep + 1;
-        const currentFlow = interviewFlows[activeTrack];
+        const currentFlow = interviewFlows.personal;
 
         if (nextStep < currentFlow.length) {
           const nextAi: Message = {
@@ -100,7 +100,7 @@ export default function AIInterviewSection({ onComplete }: { onComplete?: (resul
     setFreeInput("");
   };
 
-  const isComplete = activeTrack ? currentStep >= interviewFlows[activeTrack].length : false;
+  const isComplete = activeTrack === "personal" ? currentStep >= interviewFlows.personal.length : false;
 
   return (
     <section id="interview" className="bg-wood text-cream py-24 md:py-40">

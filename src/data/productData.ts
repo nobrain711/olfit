@@ -17,7 +17,7 @@ export interface Product {
   notes: string; // 간략한 노트 요약 (호버용)
   family: string;
   featured?: boolean;
-  category: "Personal" | "Space";
+  category: "Personal";
   /** 클릭 시 모달에 노출될 상세 정보 */
   details: {
     story: string; // 향수의 탄생 스토리 또는 분위기 설명

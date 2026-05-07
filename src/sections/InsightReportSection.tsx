@@ -9,7 +9,7 @@ import RadarChart from "@/components/common/RadarChart";
 import LayeringRecipe from "@/components/report/LayeringRecipe";
 import SimilarAuras from "@/components/report/SimilarAuras";
 import { radarData, auras } from "@/data/reportData";
-import { getRecommendedProducts, getLayeringRecommendation } from "@/data/recommendationEngine";
+import { getLayeringRecommendation } from "@/data/recommendationEngine";
 import { Download } from "lucide-react";
 import html2canvas from "html2canvas";
 import { useRef, useMemo } from "react";
@@ -19,7 +19,6 @@ export default function InsightReportSection({ results }: { results: AnalysisRes
   const { ref: ref1, isVisible: vis1 } = useIntersectionObserver();
   const { ref: ref2, isVisible: vis2 } = useIntersectionObserver();
   const { ref: ref3, isVisible: vis3 } = useIntersectionObserver();
-  const { ref: ref4, isVisible: vis4 } = useIntersectionObserver();
   const reportRef = useRef<HTMLDivElement>(null);
 
   // 다이내믹 데이터 계산

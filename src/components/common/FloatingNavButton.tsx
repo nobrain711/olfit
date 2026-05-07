@@ -9,7 +9,7 @@ import { ArrowUp } from "lucide-react";
 
 export default function FloatingNavButton() {
   const [isVisible, setIsVisible] = useState(false);
-  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 스크롤 위치에 따라 버튼 표시 여부 결정
   useEffect(() => {

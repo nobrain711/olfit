@@ -36,25 +36,6 @@ export function getRecommendedProducts(results: AnalysisResults | null): Product
     // 2. 해당 패밀리에 속하는 제품 필터링
     return personalProducts.filter(p => targetFamilies.includes(p.family));
   } 
-  
-  if (results.type === "space") {
-    const texture = results.spaceTexture || "";
-    const color = results.spaceColor || "";
-
-    let targetFamilies: string[] = [];
-
-    if (texture.includes("원목") || color.includes("우드")) {
-      targetFamilies = ["우디 (인센스)", "시그니처 (인센스)"];
-    } else if (texture.includes("금속") || texture.includes("스톤")) {
-      targetFamilies = ["프레쉬 (인센스)", "시트러스 (인센스)"];
-    } else if (texture.includes("패브릭") || color.includes("화이트")) {
-      targetFamilies = ["머스크 (인센스)", "플로랄 (인센스)"];
-    } else {
-      targetFamilies = ["시그니처 (인센스)"];
-    }
-
-    return nagChampaProducts.filter(p => targetFamilies.includes(p.family));
-  }
 
   return [];
 }
