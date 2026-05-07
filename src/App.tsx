@@ -58,14 +58,14 @@ export default function App() {
       {/* 개인정보 동의 모달 (필수) */}
       {!hasConsented && <PrivacyConsentModal onAgree={handleAgree} />}
 
+      {/* 상단 네비게이션 바: 트랜스폼 컨테이너 외부에 배치하여 fixed 포지션 유지 */}
+      <Navigation />
+
       {/* 
         메인 콘텐츠 영역 
         동의 전까지 블러 처리 및 상호작용 방지
       */}
-      <div className={`transition-all duration-700 ${!hasConsented ? "blur-xl scale-[1.02] pointer-events-none select-none" : "blur-0 scale-100"}`}>
-        {/* 상단 네비게이션 바 */}
-        <Navigation />
-        
+      <div className={`transition-all duration-700 ${!hasConsented ? "blur-xl scale-[1.02] pointer-events-none select-none" : "blur-0"}`}>
         {/* 메인 콘텐츠 영역 */}
         <main>
           {/* 히어로 섹션: 첫 화면 및 인트로 */}
