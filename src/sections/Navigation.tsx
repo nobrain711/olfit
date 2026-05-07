@@ -90,13 +90,13 @@ export default function Navigation() {
 
       {/* 전체 화면 메뉴 오버레이 */}
       <div
-        className={`fixed inset-0 z-[60] bg-cream transition-transform duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
-          menuOpen ? "translate-y-0" : "-translate-y-full"
+        className={`fixed inset-0 z-[60] bg-cream/98 backdrop-blur-md transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${
+          menuOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
         }`}
       >
-        <div className="h-full flex flex-col">
+        <div className="h-full flex flex-col overflow-y-auto">
           {/* 메뉴 상단: 닫기 버튼 */}
-          <div className="h-16 md:h-20 flex items-center justify-end px-6 md:px-8">
+          <div className="h-16 md:h-20 flex items-center justify-end px-6 md:px-8 flex-shrink-0">
             <button
               onClick={() => setMenuOpen(false)}
               className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-widest hover:opacity-60 transition-opacity duration-300 text-wood"
@@ -107,36 +107,45 @@ export default function Navigation() {
           </div>
 
           {/* 메뉴 중앙: 링크 리스트 */}
-          <nav className="flex-1 flex flex-col justify-center px-6 md:px-16 lg:px-32 max-w-4xl mx-auto w-full">
-            {navLinks.map((link, i) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={() => setMenuOpen(false)}
-                className="group py-3 md:py-4 border-b border-wood/10 flex items-center justify-between"
-                style={{
-                  transitionDelay: menuOpen ? `${i * 50}ms` : "0ms",
-                }}
-              >
-                <span
-                  className={`text-2xl sm:text-3xl md:text-4xl font-light tracking-tight transition-all duration-700 ${
-                    menuOpen
-                      ? "translate-x-0 opacity-100"
-                      : "-translate-x-8 opacity-0"
-                  }`}
+          <nav className="flex-1 flex flex-col justify-center max-w-2xl mx-auto w-full px-6 py-12">
+            <div className="space-y-2 md:space-y-4">
+              {navLinks.map((link, i) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="group py-4 md:py-6 border-b border-wood/10 flex items-center justify-between hover:border-wood/30 transition-colors"
+                  style={{
+                    transitionDelay: menuOpen ? `${i * 50}ms` : "0ms",
+                  }}
                 >
-                  {link.label}
-                </span>
-                <span className="text-[10px] md:text-[12px] font-mono text-wood/30 group-hover:text-wood transition-colors duration-300">
-                  0{i + 1}
-                </span>
-              </a>
-            ))}
+                  <span
+                    className={`text-3xl sm:text-4xl md:text-5xl font-light tracking-tight transition-all duration-700 ${
+                      menuOpen
+                        ? "translate-x-0 opacity-100"
+                        : "translate-x-4 opacity-0"
+                    }`}
+                  >
+                    {link.label}
+                  </span>
+                  <div className="flex items-center gap-4">
+                    <span className={`text-[10px] md:text-[11px] font-mono text-wood/20 group-hover:text-wood/50 transition-colors duration-500 ${
+                      menuOpen ? "opacity-100" : "opacity-0"
+                    }`}>
+                      VIEW SECTION
+                    </span>
+                    <span className="text-[10px] md:text-[12px] font-mono text-wood/30 group-hover:text-wood transition-colors duration-300">
+                      0{i + 1}
+                    </span>
+                  </div>
+                </a>
+              ))}
+            </div>
           </nav>
 
           {/* 메뉴 하단: 카피라이트 */}
-          <div className="px-6 md:px-16 lg:px-24 pb-12">
-            <p className="text-[10px] md:text-[11px] text-wood/40 tracking-widest">
+          <div className="max-w-2xl mx-auto w-full px-6 pb-12 flex-shrink-0">
+            <p className="text-[10px] md:text-[11px] text-wood/40 tracking-widest uppercase">
               © 2026 Olfit. AI Scent Stylist.
             </p>
           </div>
