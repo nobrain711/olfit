@@ -4,7 +4,7 @@
  * 필터링 기능(전체, 맞춤, 비건, 에코)과 제품 호버 효과를 포함합니다.
  */
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import ProductCard from "@/components/curated/ProductCard";
 import ProductModal from "@/components/curated/ProductModal";
@@ -22,13 +22,16 @@ export default function CuratedSelectionSection({ results }: { results: Analysis
   const [activeBrand, setActiveBrand] = useState<string>("All");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  useEffect(() => {
+  // Deriving state from props during render phase (React best practice for sync state with props)
+  const [prevResults, setPrevResults] = useState<AnalysisResults | null>(results);
+  if (results !== prevResults) {
+    setPrevResults(results);
     if (results?.type) {
       const targetCat = results.type === "personal" ? "Personal" : "Space";
       setActiveCategory(targetCat as "Personal" | "Space");
       setActiveFilter("For You");
     }
-  }, [results?.type]);
+  }
 
   const handleCategoryChange = (cat: "Personal" | "Space") => {
     setActiveCategory(cat);
