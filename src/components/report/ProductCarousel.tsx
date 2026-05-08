@@ -3,10 +3,11 @@
  * @description 추천된 제품들을 1개씩 자동으로 보여주는 캐러셀 컴포넌트입니다.
  */
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ThumbsUp, ThumbsDown } from "lucide-react";
+import { toast } from "sonner";
 import type { Product } from "@/data/productData";
 
 interface ProductCarouselProps {
@@ -14,13 +15,32 @@ interface ProductCarouselProps {
   onProductClick: (product: Product) => void;
 }
 
+type Feedback = "like" | "dislike" | null;
+
 export default function ProductCarousel({ products, onProductClick }: ProductCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
     Autoplay({ delay: 30000, stopOnInteraction: false })
   ]);
+  
+  const [feedbacks, setFeedbacks] = useState<Record<number, Feedback>>({});
 
   const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
+
+  const handleFeedback = (e: React.MouseEvent, productId: number, type: Feedback) => {
+    e.stopPropagation();
+    
+    const currentFeedback = feedbacks[productId];
+    const newFeedback = currentFeedback === type ? null : type;
+    
+    setFeedbacks(prev => ({ ...prev, [productId]: newFeedback }));
+    
+    if (newFeedback === "like") {
+      toast.success("이 향수를 위시리스트에 담았습니다.");
+    } else if (newFeedback === "dislike") {
+      toast.info("취향 피드백이 반영되었습니다.");
+    }
+  };
 
   return (
     <div>
@@ -45,14 +65,38 @@ export default function ProductCarousel({ products, onProductClick }: ProductCar
                     </div>
                   </div>
                   
-                  <div className="w-full md:w-1/2 text-left">
+                  <div className="w-full md:w-1/2 text-left relative">
+                    {/* Feedback Buttons */}
+                    <div className="absolute top-0 right-0 flex gap-2">
+                      <button
+                        onClick={(e) => handleFeedback(e, item.id, "like")}
+                        className={`p-2 rounded-full transition-all duration-300 ${
+                          feedbacks[item.id] === "like"
+                            ? "bg-wood text-cream group-hover:bg-cream group-hover:text-wood scale-110"
+                            : "bg-wood/5 text-wood/40 group-hover:bg-cream/10 group-hover:text-cream/40 hover:scale-110"
+                        }`}
+                      >
+                        <ThumbsUp size={14} fill={feedbacks[item.id] === "like" ? "currentColor" : "none"} />
+                      </button>
+                      <button
+                        onClick={(e) => handleFeedback(e, item.id, "dislike")}
+                        className={`p-2 rounded-full transition-all duration-300 ${
+                          feedbacks[item.id] === "dislike"
+                            ? "bg-red-900/80 text-cream scale-110"
+                            : "bg-wood/5 text-wood/40 group-hover:bg-cream/10 group-hover:text-cream/40 hover:scale-110 hover:text-red-400"
+                        }`}
+                      >
+                        <ThumbsDown size={14} fill={feedbacks[item.id] === "dislike" ? "currentColor" : "none"} />
+                      </button>
+                    </div>
+
                     {index === 0 && (
                       <div className="inline-flex items-center justify-center px-2 py-1 bg-wood/10 border border-wood/20 rounded-sm mb-3 group-hover:bg-cream/10 group-hover:border-cream/30 transition-colors">
                         <span className="text-[9px] font-bold text-wood group-hover:text-cream tracking-[0.15em] uppercase leading-none">Best Pick</span>
                       </div>
                     )}
                     <p className="text-[11px] uppercase tracking-[0.2em] text-wood/40 group-hover:text-cream/40 mb-2 transition-colors">{item.brand}</p>
-                    <h4 className="text-2xl sm:text-3xl font-light text-wood group-hover:text-cream mb-6 break-keep transition-colors leading-tight">
+                    <h4 className="text-2xl sm:text-3xl font-light text-wood group-hover:text-cream mb-6 break-keep transition-colors leading-tight pr-16">
                       {item.name}
                     </h4>
                     

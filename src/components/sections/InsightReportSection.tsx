@@ -68,6 +68,7 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
     ];
     return baseData.map(d => ({
       ...d,
+      description: radarData.find(rd => rd.axis === d.axis)?.description,
       value: Math.max(0.1, Math.min(0.95, d.value + (Math.random() * 0.1)))
     }));
   };

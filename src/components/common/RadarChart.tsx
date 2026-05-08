@@ -10,7 +10,7 @@ import { radarData } from "@/data/reportData";
 
 interface RadarChartProps {
   /** 인터뷰 결과 데이터 (축 이름과 0~1 사이의 수치 리스트) */
-  data?: { axis: string; value: number }[];
+  data?: { axis: string; value: number; description?: string }[];
   /** 인터뷰 결과가 즉시 로드될 때 애니메이션을 강제로 트리거할지 여부 */
   forceDraw?: boolean;
 }
@@ -18,6 +18,7 @@ interface RadarChartProps {
 export default function RadarChart({ data, forceDraw }: RadarChartProps) {
   const { ref, isVisible } = useIntersectionObserver();
   const [drawn, setDrawn] = useState(false);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   // 전달된 데이터가 없으면 기본 정적 데이터 사용
   const chartData = data || radarData;
@@ -50,7 +51,7 @@ export default function RadarChart({ data, forceDraw }: RadarChartProps) {
     .join(" ");
 
   return (
-    <div ref={ref} className="w-full max-w-[320px] mx-auto aspect-square flex items-center justify-center">
+    <div ref={ref} className="relative w-full max-w-[320px] mx-auto aspect-square flex items-center justify-center">
       <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full overflow-visible">
         {/* 그리드 가이드 원들 */}
         {[0.2, 0.4, 0.6, 0.8, 1].map((r) => (
@@ -96,10 +97,12 @@ export default function RadarChart({ data, forceDraw }: RadarChartProps) {
               key={`point-${i}`}
               cx={p.x}
               cy={p.y}
-              r={3}
+              r={hoveredIndex === i ? 5 : 3}
               fill="#6B4423"
-              className={`transition-all duration-500 ${drawn ? "opacity-100" : "opacity-0"}`}
-              style={{ transitionDelay: `${600 + i * 100}ms` }}
+              className={`transition-all duration-500 cursor-help ${drawn ? "opacity-100" : "opacity-0"}`}
+              style={{ transitionDelay: drawn ? "0ms" : `${600 + i * 100}ms` }}
+              onMouseEnter={() => setHoveredIndex(i)}
+              onMouseLeave={() => setHoveredIndex(null)}
             />
           );
         })}
@@ -113,14 +116,48 @@ export default function RadarChart({ data, forceDraw }: RadarChartProps) {
               y={p.y}
               textAnchor="middle"
               dominantBaseline="middle"
-              className="text-[12px] md:text-[11px] fill-wood/60 font-medium uppercase tracking-[0.15em]"
+              className={`text-[12px] md:text-[11px] font-medium uppercase tracking-[0.15em] cursor-help transition-colors duration-300 ${
+                hoveredIndex === i ? "fill-wood" : "fill-wood/60"
+              }`}
               style={{ fontFamily: "'Playfair Display', serif" }}
+              onMouseEnter={() => setHoveredIndex(i)}
+              onMouseLeave={() => setHoveredIndex(null)}
             >
               {d.axis}
             </text>
           );
         })}
       </svg>
+
+      {/* 툴팁 레이어 */}
+      {hoveredIndex !== null && chartData[hoveredIndex].description && (
+        <div 
+          className="absolute z-10 bg-white/95 backdrop-blur-sm border border-wood/20 px-3 py-2 rounded-lg shadow-xl pointer-events-none animate-in fade-in zoom-in duration-200"
+          style={{
+            top: `${(getPoint(hoveredIndex, 1.45).y / size) * 100}%`,
+            left: `${(getPoint(hoveredIndex, 1.45).x / size) * 100}%`,
+            transform: 'translate(-50%, -50%)',
+            width: 'max-content',
+            maxWidth: '180px'
+          }}
+        >
+          <p className="text-[10px] text-wood/80 leading-relaxed text-center break-keep">
+            {chartData[hoveredIndex].description}
+          </p>
+          {/* 말풍선 꼬리 */}
+          <div 
+            className={`absolute w-2 h-2 bg-white border-wood/20 rotate-45 ${
+              hoveredIndex === 0 || hoveredIndex === 1 || hoveredIndex === 4 
+                ? "bottom-[-5px] border-b border-r" 
+                : "top-[-5px] border-t border-l"
+            }`}
+            style={{
+              left: '50%',
+              marginLeft: '-4px',
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }

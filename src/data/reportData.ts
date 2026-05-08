@@ -29,9 +29,29 @@ export const auras = [
  * 방사형 차트용 초기 데이터 (향기 노트별 분석 수치)
  */
 export const radarData = [
-  { axis: "플로랄", value: 0.3 },
-  { axis: "우디", value: 0.75 },
-  { axis: "오리엔탈", value: 0.45 },
-  { axis: "프레시", value: 0.6 },
-  { axis: "구르망", value: 0.2 },
+  { 
+    axis: "플로랄", 
+    value: 0.3,
+    description: "꽃들의 섬세한 결이 모여 완성되는 풍성한 아름다움"
+  },
+  { 
+    axis: "우디", 
+    value: 0.75,
+    description: "나무의 결에서 느껴지는 따뜻하고 묵직한 힘"
+  },
+  { 
+    axis: "오리엔탈", 
+    value: 0.45,
+    description: "이국적인 향신료와 따스한 수지가 어우러진 깊은 잔향"
+  },
+  { 
+    axis: "프레시", 
+    value: 0.6,
+    description: "갓 딴 과일의 싱그러움과 맑은 공기의 청량함"
+  },
+  { 
+    axis: "구르망", 
+    value: 0.2,
+    description: "바닐라, 초콜릿처럼 달콤하고 포근한 미식의 향기"
+  },
 ];
