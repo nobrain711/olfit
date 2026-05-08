@@ -124,69 +124,75 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
 
         {/* 비주얼 피라미드 슬롯 */}
         <div className="relative w-80 h-80 md:w-96 md:h-96 flex flex-col items-center order-1 lg:order-2 group">
-          {/* 피라미드 가이드 라인 및 베이스 쉐이프 (SVG) */}
+          
+          {/* ⭐️ [완벽 해결] 배경 하이라이트를 선(Line)을 그리는 SVG 안으로 합쳤습니다! */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none drop-shadow-sm" viewBox="0 0 100 100">
             {/* 전체 피라미드 베이스 (연한 반투명 배경) */}
-            <path 
-              d="M50 5 L95 90 L5 90 Z" 
-              fill="currentColor" 
-              className="text-wood/[0.03]"
+            <path d="M50 5 L95 90 L5 90 Z" fill="currentColor" className="text-wood/[0.03]" />
+            
+            {/* --- [추가된 정확한 하이라이트 폴리곤(다각형)] --- */}
+            {/* Top 영역 색칠 */}
+            <polygon 
+              points="50,5 67,33 33,33" 
+              fill="currentColor"
+              className={`transition-all duration-1000 ${slots.Top ? 'text-wood/15 opacity-100' : 'opacity-0'}`} 
             />
-            {/* 외곽선 */}
-            <path 
-              d="M50 5 L95 90 L5 90 Z" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="0.2" 
-              className="text-wood/20"
+            {/* Middle 영역 색칠 (고깔모자 완벽 해결!) */}
+            <polygon 
+              points="33,33 67,33 84,62 16,62" 
+              fill="currentColor"
+              className={`transition-all duration-1000 ${slots.Middle ? 'text-wood/15 opacity-100' : 'opacity-0'}`} 
             />
-            {/* 수평 분할선 */}
+            {/* Base 영역 색칠 */}
+            <polygon 
+              points="16,62 84,62 95,90 5,90" 
+              fill="currentColor"
+              className={`transition-all duration-1000 ${slots.Base ? 'text-wood/15 opacity-100' : 'opacity-0'}`} 
+            />
+            {/* -------------------------------------- */}
+
+            {/* 외곽선 및 수평 분할선 */}
+            <path d="M50 5 L95 90 L5 90 Z" fill="none" stroke="currentColor" strokeWidth="0.2" className="text-wood/20" />
             <line x1="33" y1="33" x2="67" y2="33" stroke="currentColor" strokeWidth="0.15" className="text-wood/10" />
             <line x1="16" y1="62" x2="84" y2="62" stroke="currentColor" strokeWidth="0.15" className="text-wood/10" />
           </svg>
 
-          {/* 슬롯 레이어들 (높이를 더 확보함) */}
+          {/* 슬롯 레이어들 (클릭 영역 및 텍스트만 남기고 배경색 div는 모두 제거) */}
           <div className="w-full h-full flex flex-col items-center pt-2 pb-8">
             
-            {/* TOP SLOT (약 32%) */}
+            {/* TOP SLOT 텍스트 영역 */}
             <div 
               onClick={() => handleTabChange('Top')}
               className={`relative z-10 w-full h-[32%] flex flex-col items-center justify-end pb-4 cursor-pointer transition-all duration-700 ${
                 slots.Top ? 'text-wood' : 'text-wood/20'
               } ${activeTab === 'Top' ? 'scale-105' : 'hover:scale-102'}`}
             >
-              <div className={`absolute inset-x-0 bottom-0 h-full transition-all duration-1000 ${slots.Top ? 'bg-wood/15 opacity-100 shadow-[0_0_30px_rgba(var(--wood-rgb),0.1)]' : 'opacity-0'}`} 
-                   style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }} />
               <span className="text-[7px] uppercase tracking-[0.3em] mb-1.5 font-bold">Top</span>
               <span className="text-[11px] md:text-[12px] font-medium tracking-tight truncate max-w-[80px] text-center px-2">
                 {slots.Top ? slots.Top.name : "Select"}
               </span>
             </div>
 
-            {/* MIDDLE SLOT (약 32%) */}
+            {/* MIDDLE SLOT 텍스트 영역 */}
             <div 
               onClick={() => handleTabChange('Middle')}
               className={`relative z-10 w-full h-[32%] flex flex-col items-center justify-center cursor-pointer transition-all duration-700 ${
                 slots.Middle ? 'text-wood' : 'text-wood/20'
               } ${activeTab === 'Middle' ? 'scale-105' : 'hover:scale-102'}`}
             >
-              <div className={`absolute inset-x-0 bottom-0 h-full transition-all duration-1000 ${slots.Middle ? 'bg-wood/15 opacity-100' : 'opacity-0'}`}
-                   style={{ clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%, 50% 100%)' }} />
               <span className="text-[7px] uppercase tracking-[0.3em] mb-1.5 font-bold">Middle</span>
               <span className="text-[11px] md:text-[12px] font-medium tracking-tight text-center px-2">
                 {slots.Middle ? slots.Middle.name : "Select"}
               </span>
             </div>
 
-            {/* BASE SLOT (약 34%) */}
+            {/* BASE SLOT 텍스트 영역 */}
             <div 
               onClick={() => handleTabChange('Base')}
               className={`relative z-10 w-full h-[34%] flex flex-col items-center justify-start pt-6 cursor-pointer transition-all duration-700 ${
                 slots.Base ? 'text-wood' : 'text-wood/20'
               } ${activeTab === 'Base' ? 'scale-105' : 'hover:scale-102'}`}
             >
-              <div className={`absolute inset-x-0 bottom-0 h-full transition-all duration-1000 ${slots.Base ? 'bg-wood/15 opacity-100' : 'opacity-0'}`}
-                   style={{ clipPath: 'polygon(50% 0%, 50% 0%, 100% 100%, 0% 100%)' }} />
               <span className="text-[7px] uppercase tracking-[0.3em] mb-1.5 font-bold">Base</span>
               <span className="text-[11px] md:text-[12px] font-medium tracking-tight text-center px-2">
                 {slots.Base ? slots.Base.name : "Select"}
