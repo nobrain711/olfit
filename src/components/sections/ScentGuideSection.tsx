@@ -21,7 +21,7 @@ export default function ScentGuideSection({ onNotesChange }: { onNotesChange?: (
           {/* 섹션 헤더 */}
           <div className="max-w-3xl mb-16 md:mb-20">
             <p className="label-upper text-wood/40 mb-4">Scent Education</p>
-            <h2 className="text-2xl sm:text-4xl md:text-5xl font-light tracking-tight mb-6 md:mb-8 text-wood break-keep text-wood">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-light tracking-tight mb-6 md:mb-8 text-wood break-keep text-wood" style={{ fontFamily: "'Playfair Display', serif" }}>
               향기를 이해하는,&nbsp;<span className="hidden sm:inline"><br /></span>가장 쉬운 방법
             </h2>
             <p className="text-wood/60 leading-relaxed text-[15px] sm:text-lg break-keep max-w-3xl text-wood">

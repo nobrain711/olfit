@@ -43,7 +43,7 @@ export default function SafetyValuesSection() {
           {/* 섹션 헤더 */}
           <div className="text-center mb-16">
             <p className="label-upper text-cream/40 mb-4">Trust & Values</p>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
               믿을 수 있는 기준
             </h2>
           </div>

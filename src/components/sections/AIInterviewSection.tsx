@@ -83,7 +83,7 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
         <div ref={ref} className={`transition-all duration-800 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <div className="text-center mb-16">
             <p className="label-upper text-cream/40 mb-4">AI Visual Analysis</p>
-            <h2 className="text-2xl sm:text-4xl md:text-5xl font-light tracking-tight break-keep text-cream">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-light tracking-tight break-keep text-cream" style={{ fontFamily: "'Playfair Display', serif" }}>
               {isComplete ? "분석이 완료되었습니다" : "당신의 스타일을 보여주세요"}
             </h2>
             <p className="mt-6 text-cream/40 text-[13px] max-w-xl mx-auto break-keep">
