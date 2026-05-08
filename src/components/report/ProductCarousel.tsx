@@ -27,7 +27,7 @@ export default function ProductCarousel({ products, onProductClick }: ProductCar
       <div className="relative max-w-4xl mx-auto px-12">
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex">
-            {products.map((item) => (
+            {products.map((item, index) => (
               <div key={item.id} className="flex-[0_0_100%] min-w-0 px-4">
                 <div 
                   onClick={() => onProductClick(item)}
@@ -46,6 +46,11 @@ export default function ProductCarousel({ products, onProductClick }: ProductCar
                   </div>
                   
                   <div className="w-full md:w-1/2 text-left">
+                    {index === 0 && (
+                      <div className="inline-block px-2 py-0.5 bg-wood/10 border border-wood/20 rounded-sm mb-3 group-hover:bg-cream/10 group-hover:border-cream/30 transition-colors">
+                        <span className="text-[9px] font-bold text-wood group-hover:text-cream tracking-[0.15em] uppercase">Best Pick</span>
+                      </div>
+                    )}
                     <p className="text-[11px] uppercase tracking-[0.2em] text-wood/40 group-hover:text-cream/40 mb-2 transition-colors">{item.brand}</p>
                     <h4 className="text-2xl sm:text-3xl font-light text-wood group-hover:text-cream mb-6 break-keep transition-colors leading-tight">
                       {item.name}
