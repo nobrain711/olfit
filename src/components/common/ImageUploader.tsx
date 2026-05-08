@@ -27,8 +27,8 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
       img.src = event.target?.result as string;
       img.onload = () => {
         const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 800; // 가로 최대 800px로 제한하여 경량화
-        const MAX_HEIGHT = 800;
+        const MAX_WIDTH = 1200; // 해상도 상향 (800 -> 1200)
+        const MAX_HEIGHT = 1200;
         
         let width = img.width;
         let height = img.height;
@@ -50,8 +50,8 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
         const ctx = canvas.getContext("2d");
         ctx?.drawImage(img, 0, 0, width, height);
         
-        // JPEG 포맷으로 압축하여 Base64 추출 (품질 0.7)
-        const base64 = canvas.toDataURL("image/jpeg", 0.7);
+        // JPEG 포맷 품질 상향 (0.7 -> 0.9)
+        const base64 = canvas.toDataURL("image/jpeg", 0.9);
         setPreview(base64);
         onImageProcessed(base64);
       };

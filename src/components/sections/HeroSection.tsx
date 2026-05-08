@@ -6,6 +6,7 @@
 
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import { ArrowRight } from "lucide-react";
+import OlfitLogo from "@/components/common/OlfitLogo";
 
 export default function HeroSection() {
   // 섹션이 화면에 나타나는지 감지 (페이드인 애니메이션용)
@@ -30,17 +31,19 @@ export default function HeroSection() {
 
       {/* 중앙 로고 및 서브타이틀 영역 */}
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-10 px-6">
-        <div className="overflow-hidden mb-2">
-          <h1 
-            className={`text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-light tracking-[0.2em] uppercase text-cream transition-all duration-1000 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
-          >
-            Olfit
-          </h1>
+        <div 
+          className={`transition-all duration-1000 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+        >
+          <OlfitLogo 
+            width="auto" 
+            height="clamp(60px, 15vw, 120px)" 
+            color="#FDFCF0" 
+          />
         </div>
         <p 
-          className={`text-cream/60 text-[10px] sm:text-sm md:text-base tracking-[0.2em] sm:tracking-[0.3em] uppercase mt-4 transition-all duration-1000 delay-300 ${
+          className={`text-cream/60 text-[10px] sm:text-sm md:text-base tracking-[0.2em] sm:tracking-[0.3em] uppercase mt-8 transition-all duration-1000 delay-300 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           }`}
         >
