@@ -3,7 +3,7 @@
  * @description 사이트에서 판매 및 추천하는 향수 제품들의 데이터베이스입니다.
  */
 
-import { personalProducts } from '../../crawler/personalData';
+import { personalProducts } from './personalData';
 
 export interface Product {
   id: number;

@@ -5,14 +5,14 @@
  */
 
 import { useState } from "react";
-import Navigation from "@/sections/Navigation";
-import HeroSection from "@/sections/HeroSection";
-import PhilosophySection from "@/sections/PhilosophySection";
-import ScentGuideSection from "@/sections/ScentGuideSection";
-import AIInterviewSection from "@/sections/AIInterviewSection";
-import InsightReportSection from "@/sections/InsightReportSection";
-import SafetyValuesSection from "@/sections/SafetyValuesSection";
-import FooterSection from "@/sections/FooterSection";
+import Navigation from "@/components/layout/Navigation";
+import HeroSection from "@/components/sections/HeroSection";
+import PhilosophySection from "@/components/sections/PhilosophySection";
+import ScentGuideSection from "@/components/sections/ScentGuideSection";
+import AIInterviewSection from "@/components/sections/AIInterviewSection";
+import InsightReportSection from "@/components/sections/InsightReportSection";
+import SafetyValuesSection from "@/components/sections/SafetyValuesSection";
+import FooterSection from "@/components/layout/FooterSection";
 import FloatingNavButton from "@/components/common/FloatingNavButton";
 import PrivacyConsentModal from "@/components/common/PrivacyConsentModal";
 import ProductModal from "@/components/curated/ProductModal";

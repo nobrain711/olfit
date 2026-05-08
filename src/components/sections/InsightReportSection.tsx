@@ -8,7 +8,7 @@ import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import RadarChart from "@/components/common/RadarChart";
 import ProductCarousel from "@/components/report/ProductCarousel";
 import { radarData } from "@/data/reportData";
-import { getRecommendedProducts } from "@/data/recommendationEngine";
+import { getRecommendedProducts } from "@/services/recommendationEngine";
 import { Download } from "lucide-react";
 import html2canvas from "html2canvas";
 import { useRef, useMemo, useState } from "react";

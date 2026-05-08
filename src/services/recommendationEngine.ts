@@ -5,8 +5,8 @@
  */
 
 import type { AnalysisResults } from "@/types";
-import { personalProducts } from "../../crawler/personalData";
-import type { Product } from "./productData";
+import { personalProducts } from "@/data/personalData";
+import type { Product } from "@/data/productData";
 
 /**
  * 인터뷰 결과에 따른 추천 제품들을 반환합니다.
