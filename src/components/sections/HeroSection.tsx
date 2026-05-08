@@ -58,7 +58,7 @@ export default function HeroSection() {
             {/* 카드 내 썸네일 이미지 */}
             <div className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-cream/10 flex-shrink-0 overflow-hidden">
               <img
-                src="/product_1.jpg"
+                src="https://www.byredo.com/cdn-cgi/image/width=auto,height=1200,fit=scale-down,gravity=auto,format=webp,quality=70/https://www.byredo.com/media/catalog/product/cache/74c1057f7991b4edb2bc7bdaa94de933/8/0/806014_1_full_no.jpg"
                 alt="Scent Exploration"
                 className="w-full h-full object-cover mix-blend-lighten opacity-90"
               />
