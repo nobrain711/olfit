@@ -105,7 +105,10 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
       await new Promise(resolve => setTimeout(resolve, 800));
 
       // 3. html2canvas 실행 (안정성 강화 옵션)
-      const canvas = await html2canvas(reportRef.current, {
+      const reportElement = reportRef.current;
+      if (!reportElement) throw new Error("리포트 요소를 찾을 수 없습니다.");
+
+      const canvas = await html2canvas(reportElement, {
         backgroundColor: "#FDFCF0",
         scale: 1.5, // 메모리 안전을 위해 1.5배로 하향 (모바일 호환성 극대화)
         useCORS: true,
