@@ -135,13 +135,18 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
           allElements.forEach((node) => {
             const target = node as HTMLElement;
             target.style.boxSizing = "border-box";
-            
+
             // Tailwind의 opacity-0 이나 animate-in 효과 무력화 (!important 강제 적용)
             target.style.setProperty("opacity", "1", "important");
             target.style.setProperty("visibility", "visible", "important");
             target.style.setProperty("transform", "none", "important");
             target.style.setProperty("animation", "none", "important");
             target.style.setProperty("transition", "none", "important");
+
+            // 불필요한 UI 요소 숨기기 (버튼, 화살표 등)
+            if (target.tagName === "BUTTON" || target.innerText?.includes("Explore") || target.classList.contains("sr-only")) {
+              target.style.display = "none";
+            }
           });
 
           // 텍스트 깨짐 방지
@@ -154,17 +159,32 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
 
           // 고급스러운 OLFIT 로고/헤더 추가
           const header = clonedDoc.createElement("div");
-          header.style.cssText = "display:flex; justify-content:space-between; align-items:center; margin-bottom:40px; border-bottom:1px solid rgba(107,68,35,0.1); padding-bottom:15px;";
+          header.style.cssText = "display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:60px; border-bottom:1px solid rgba(107,68,35,0.1); padding-bottom:20px;";
+
+          const userImage = results?.analysisMetadata?.base64Image;
+          const imageHtml = userImage 
+            ? `<div style="width: 60px; height: 60px; background: #eee; overflow: hidden; border-radius: 2px; margin-right: 20px;">
+                 <img src="${userImage}" style="width: 100%; height: 100%; object-fit: cover;" />
+               </div>` 
+            : "";
+
           header.innerHTML = `
-            <div style="font-family: 'Playfair Display', serif; font-size:28px; font-weight: 300; letter-spacing: 0.25em; color:#6B4423; text-transform: uppercase;">OLFIT</div>
+            <div style="display: flex; align-items: center;">
+              ${imageHtml}
+              <div>
+                <div style="font-family: 'Playfair Display', serif; font-size:28px; font-weight: 300; letter-spacing: 0.25em; color:#6B4423; text-transform: uppercase; line-height: 1;">OLFIT</div>
+                <div style="font-size: 10px; color: #6B4423; margin-top: 8px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;">Visual Identity Matching</div>
+              </div>
+            </div>
             <div style="text-align: right;">
               <div style="font-size: 11px; font-weight: 600; color: #6B4423; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px;">Precision Analysis Report</div>
-              <div style="font-size: 10px; color:rgba(107, 68, 35, 0.5); letter-spacing: 0.05em;">${new Date().toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+              <div style="font-size:10px; color:rgba(107, 68, 35, 0.5); letter-spacing: 0.05em;">${new Date().toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}</div>
             </div>
           `;
           el.prepend(header);
-        }
-      });
+          }
+          });
+
 
       return new Promise<Blob | null>((resolve) => {
         canvas.toBlob((blob) => resolve(blob), "image/png", 1.0); // 화질을 위해 0.9에서 1.0으로 복구
