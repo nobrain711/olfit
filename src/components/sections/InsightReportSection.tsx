@@ -124,7 +124,11 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
           // 클론된 DOM의 이미지를 스타일리시한 플레이스홀더로 교체 (CORS 방지)
           const clonedImages = el.querySelectorAll("img");
           clonedImages.forEach((img) => {
-            if (img.src.startsWith("data:")) return; // 사용자 업로드 이미지는 유지
+            // 사용자 업로드 이미지(data:)는 아예 숨김 처리
+            if (img.src.startsWith("data:")) {
+              img.style.display = "none";
+              return;
+            }
 
             const parent = img.parentElement;
             if (!parent) return;
@@ -143,10 +147,6 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
               "기본": { bg: "#F0EDE8", color: "#6B4423", image: "/product_1.jpg" },
             };
             const theme = themes[family] || themes["기본"];
-
-            // 이름에서 이니셜 추출 (숫자 제거 후 앞 2글자)
-            const cleanName = img.alt.replace(/[0-9]/g, "").trim();
-            const initial = cleanName.substring(0, 2).toUpperCase();
 
             // 플레이스홀더 컨테이너 생성
             const placeholder = clonedDoc.createElement("div");
@@ -189,19 +189,6 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
             `;
             placeholder.appendChild(pattern);
 
-            // 이니셜 텍스트
-            const initialEl = clonedDoc.createElement("div");
-            initialEl.textContent = initial;
-            initialEl.style.cssText = `
-              font-family: 'Playfair Display', serif;
-              font-size: 32px;
-              font-weight: 400;
-              position: relative;
-              z-index: 1;
-              margin-bottom: 12px;
-            `;
-            placeholder.appendChild(initialEl);
-
             // 계열명 배지
             const badge = clonedDoc.createElement("div");
             badge.textContent = family;
@@ -213,8 +200,10 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
               padding: 4px 10px;
               opacity: 0.6;
               position: relative;
-              z-index: 1;
+              z-index: 2;
               text-transform: uppercase;
+              margin-top: auto;
+              margin-bottom: 20px;
             `;
             placeholder.appendChild(badge);
 
