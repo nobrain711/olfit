@@ -132,15 +132,15 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
             // 계열 정보 획득 (Carousel 카드에 주입한 data-family 활용)
             const family = img.closest("[data-family]")?.getAttribute("data-family") || "기본";
             
-            // 계열별 테마 설정
-            const themes: Record<string, { bg: string; color: string }> = {
-              "플로랄": { bg: "#FAE8EF", color: "#A03060" },
-              "우디": { bg: "#EDE8E0", color: "#7A5C3A" },
-              "머스크": { bg: "#E8EAF0", color: "#4A5070" },
-              "시트러스": { bg: "#FEF5E0", color: "#8A6010" },
-              "앰버": { bg: "#F5EAD8", color: "#8A5520" },
-              "프레쉬": { bg: "#E4F2EC", color: "#2A6B4A" },
-              "기본": { bg: "#F0EDE8", color: "#6B4423" },
+            // 계열별 테마 및 배경 이미지 설정
+            const themes: Record<string, { bg: string; color: string; image: string }> = {
+              "플로랄": { bg: "#FAE8EF", color: "#A03060", image: "/product_1.jpg" }, // 깔끔/플로럴
+              "우디": { bg: "#EDE8E0", color: "#7A5C3A", image: "/product_2.jpg" },   // 우디
+              "머스크": { bg: "#E8EAF0", color: "#4A5070", image: "/product_1.jpg" }, // 깔끔/머스크
+              "시트러스": { bg: "#FEF5E0", color: "#8A6010", image: "/product_4.jpg" }, // 화려/시트러스
+              "앰버": { bg: "#F5EAD8", color: "#8A5520", image: "/product_3.jpg" },   // 남자다운/앰버
+              "프레쉬": { bg: "#E4F2EC", color: "#2A6B4A", image: "/product_4.jpg" },  // 화려/프레쉬
+              "기본": { bg: "#F0EDE8", color: "#6B4423", image: "/product_1.jpg" },
             };
             const theme = themes[family] || themes["기본"];
 
@@ -154,6 +154,9 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
               width: 100%;
               height: 100%;
               background-color: ${theme.bg};
+              background-image: url('${theme.image}');
+              background-size: cover;
+              background-position: center;
               color: ${theme.color};
               display: flex;
               flex-direction: column;
@@ -164,14 +167,25 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
               border-radius: 2px;
             `;
 
+            // 이미지 위에 가독성을 위한 오버레이 레이어 추가
+            const overlay = clonedDoc.createElement("div");
+            overlay.style.cssText = `
+              position: absolute;
+              top: 0; left: 0; right: 0; bottom: 0;
+              background: ${theme.bg};
+              opacity: 0.85;
+              z-index: 0;
+            `;
+            placeholder.appendChild(overlay);
+
             // 사선 패턴 추가
             const pattern = clonedDoc.createElement("div");
             pattern.style.cssText = `
               position: absolute;
               top: 0; left: 0; right: 0; bottom: 0;
               background-image: repeating-linear-gradient(45deg, ${theme.color} 0, ${theme.color} 1px, transparent 1px, transparent 8px);
-              opacity: 0.07;
-              z-index: 0;
+              opacity: 0.05;
+              z-index: 1;
             `;
             placeholder.appendChild(pattern);
 
