@@ -4,7 +4,8 @@
  * 동의 전까지는 배경을 블러 처리하고 다른 상호작용을 차단합니다.
  */
 
-import { ShieldCheck, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import OlfitLogo from "@/components/common/OlfitLogo";
 
 interface PrivacyConsentModalProps {
   onAgree: () => void;
@@ -19,8 +20,8 @@ export default function PrivacyConsentModal({ onAgree }: PrivacyConsentModalProp
       {/* 모달 컨텐츠 */}
       <div className="relative w-full max-w-[480px] bg-cream border border-wood/10 shadow-editorial p-8 md:p-12 animate-in fade-in zoom-in duration-500">
         <div className="flex flex-col items-center text-center">
-          <div className="w-16 h-16 bg-wood/5 rounded-full flex items-center justify-center mb-8">
-            <ShieldCheck className="text-wood w-8 h-8" strokeWidth={1.5} />
+          <div className="mb-8">
+            <OlfitLogo height={32} color="#6B4423" />
           </div>
           
           <h2 className="text-2xl font-light tracking-tight text-wood mb-6">
