@@ -52,7 +52,7 @@ Olfit은 단순히 향수를 판매하는 것을 넘어, 사용자의 내면(Per
 
 ### Prerequisites
 - Node.js (v18 이상 권장)
-- npm or yarn
+- Yarn (추천) or npm
 
 ### Installation
 ```bash
@@ -62,17 +62,13 @@ git clone https://github.com/JJonyeok2/persona_l_front.git
 # 프로젝트 폴더로 이동
 cd persona_l_front
 
-# 의존성 설치
-npm install
-# or
+# 의존성 설치 (Yarn 권장)
 yarn install
 ```
 
 ### Development
 ```bash
 # 로컬 개발 서버 실행
-npm run dev
-# or
 yarn dev
 ```
 기본적으로 `http://localhost:5173`에서 실행됩니다.
@@ -80,10 +76,10 @@ yarn dev
 ### Build & Deployment
 ```bash
 # 프로덕션 빌드
-npm run build
+yarn build
 
 # 빌드 결과물 미리보기
-npm run preview
+yarn preview
 ```
 
 ---
