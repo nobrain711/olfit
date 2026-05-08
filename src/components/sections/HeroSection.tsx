@@ -30,28 +30,32 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-b from-wood/40 via-transparent to-wood/60" />
       </div>
 
-      {/* Framer Motion Glow Effects (Luxury Version): 
-        움직임이 거의 느껴지지 않을 만큼 천천히, 숨을 쉬듯 일렁이는 빛무리 
+      {/* Framer Motion Glow Effects (Luxury Version 2.0 - Gradient): 
+        브라우저 블러(Blur) 렌더링 버그(사각형 잘림)를 방지하기 위해 방사형 그라데이션 사용
       */}
       <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden mix-blend-screen">
         
-        {/* 1번 빛무리: 좌측 상단에서 미세하게 호흡 */}
+        {/* 1번 빛무리: 좌측 상단 (크림톤) */}
         <motion.div
           animate={{
             x: [0, 40, -20, 0], 
             y: [0, -30, 40, 0],
-            scale: [1, 1.05, 1], // 크기 변화도 아주 미세하게
+            scale: [1, 1.05, 1],
           }}
           transition={{
-            duration: 35, // 기존 18초 -> 35초로 극단적으로 느리게
+            duration: 35,
             repeat: Infinity,
             repeatType: "reverse",
             ease: "easeInOut",
           }}
-          className="absolute -top-[10%] -left-[10%] w-[600px] h-[600px] bg-cream/25 rounded-full blur-[130px]"
+          // blur와 bg 속성을 빼고 크기를 약간 더 키웠습니다.
+          className="absolute -top-[15%] -left-[10%] w-[800px] h-[800px] rounded-full"
+          style={{
+            background: "radial-gradient(circle, rgba(253, 252, 240, 0.15) 0%, rgba(253, 252, 240, 0) 65%)"
+          }}
         />
         
-        {/* 2번 빛무리: 우측 상단에서 반대 방향으로 천천히 흐름 */}
+        {/* 2번 빛무리: 우측 상단 (은은한 오렌지/웜톤) */}
         <motion.div
           animate={{
             x: [0, -30, 20, 0],
@@ -59,29 +63,35 @@ export default function HeroSection() {
             scale: [1, 1.1, 0.95, 1],
           }}
           transition={{
-            duration: 40, // 40초 동안 아주 천천히 이동
+            duration: 40,
             repeat: Infinity,
             repeatType: "reverse",
             ease: "easeInOut",
             delay: 2,
           }}
-          className="absolute top-[5%] -right-[10%] w-[500px] h-[500px] bg-orange-200/20 rounded-full blur-[120px]"
+          className="absolute top-[5%] -right-[15%] w-[700px] h-[700px] rounded-full"
+          style={{
+            background: "radial-gradient(circle, rgba(255, 230, 200, 0.12) 0%, rgba(255, 230, 200, 0) 65%)"
+          }}
         />
         
-        {/* 3번 빛무리: 하단에서 전체적인 안개처럼 베이스를 깔아줌 */}
+        {/* 3번 빛무리: 하단 베이스 (크림톤) */}
         <motion.div
           animate={{
             x: [0, 50, -40, 0],
             y: [0, -20, 30, 0],
           }}
           transition={{
-            duration: 45, // 가장 크고 가장 느리게
+            duration: 45,
             repeat: Infinity,
             repeatType: "reverse",
             ease: "easeInOut",
             delay: 5,
           }}
-          className="absolute -bottom-[15%] left-[15%] w-[800px] h-[800px] bg-cream/20 rounded-full blur-[150px]"
+          className="absolute -bottom-[20%] left-[10%] w-[900px] h-[900px] rounded-full"
+          style={{
+            background: "radial-gradient(circle, rgba(253, 252, 240, 0.12) 0%, rgba(253, 252, 240, 0) 65%)"
+          }}
         />
       </div>
 
