@@ -257,16 +257,8 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
           const header = clonedDoc.createElement("div");
           header.style.cssText = "display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:60px; border-bottom:1px solid rgba(107,68,35,0.1); padding-bottom:20px;";
           
-          const userImage = results?.analysisMetadata?.base64Image;
-          const imageHtml = userImage 
-            ? `<div style="width: 60px; height: 60px; background: #eee; overflow: hidden; border-radius: 2px; margin-right: 20px;">
-                 <img src="${userImage}" style="width: 100%; height: 100%; object-fit: cover;" />
-               </div>` 
-            : "";
-
           header.innerHTML = `
             <div style="display: flex; align-items: center;">
-              ${imageHtml}
               <div>
                 <div style="font-family: 'Playfair Display', serif; font-size:28px; font-weight: 300; letter-spacing: 0.25em; color:#6B4423; text-transform: uppercase; line-height: 1;">OLFIT</div>
                 <div style="font-size: 10px; color: #6B4423; margin-top: 8px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;">Visual Identity Matching</div>
