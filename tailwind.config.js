@@ -104,6 +104,20 @@ module.exports = {
           from: { strokeDashoffset: "1000" },
           to: { strokeDashoffset: "0" },
         },
+        "sunray-1": {
+          "0%, 100%": { opacity: "0.18", transform: "translate(0%, 0%) scale(1)" },
+          "30%":      { opacity: "0.28", transform: "translate(3%, -4%) scale(1.08)" },
+          "60%":      { opacity: "0.20", transform: "translate(-2%, 3%) scale(0.96)" },
+        },
+        "sunray-2": {
+          "0%, 100%": { opacity: "0.10", transform: "translate(0%, 0%) scale(1)" },
+          "40%":      { opacity: "0.18", transform: "translate(-4%, 5%) scale(1.12)" },
+          "70%":      { opacity: "0.12", transform: "translate(2%, -2%) scale(0.94)" },
+        },
+        "sunray-3": {
+          "0%, 100%": { opacity: "0.08", transform: "translate(0%, 0%) scale(1)" },
+          "50%":      { opacity: "0.16", transform: "translate(5%, 2%) scale(1.06)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -113,6 +127,9 @@ module.exports = {
         "fade-in": "fade-in 0.6s ease forwards",
         "pulse-line": "pulse-line 2s ease-in-out infinite",
         "draw-line": "draw-line 1.5s ease forwards",
+        "sunray-1": "sunray-1 9s  ease-in-out infinite",
+        "sunray-2": "sunray-2 13s ease-in-out infinite",
+        "sunray-3": "sunray-3 17s ease-in-out infinite",
       },
     },
   },

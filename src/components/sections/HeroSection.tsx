@@ -29,6 +29,33 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-b from-wood/40 via-transparent to-wood/60" />
       </div>
 
+      {/* 햇빛 레이어 1: 상단 중앙 메인 광원 (웜 앰버) */}
+      <div
+        className="absolute inset-0 z-[1] pointer-events-none animate-sunray-1"
+        style={{
+          background: "radial-gradient(ellipse 55% 40% at 52% 28%, rgba(210,170,100,0.55) 0%, rgba(180,130,70,0.15) 45%, transparent 70%)",
+          mixBlendMode: "screen",
+        }}
+      />
+
+      {/* 햇빛 레이어 2: 우측 상단 골드 하이라이트 */}
+      <div
+        className="absolute inset-0 z-[1] pointer-events-none animate-sunray-2"
+        style={{
+          background: "radial-gradient(ellipse 40% 35% at 72% 18%, rgba(240,200,130,0.40) 0%, rgba(200,155,80,0.10) 50%, transparent 72%)",
+          mixBlendMode: "screen",
+        }}
+      />
+
+      {/* 햇빛 레이어 3: 좌측 중앙 딥 앰버 깊이감 */}
+      <div
+        className="absolute inset-0 z-[1] pointer-events-none animate-sunray-3"
+        style={{
+          background: "radial-gradient(ellipse 35% 45% at 28% 35%, rgba(190,140,80,0.30) 0%, rgba(160,110,55,0.08) 55%, transparent 75%)",
+          mixBlendMode: "screen",
+        }}
+      />
+
       {/* 중앙 콘텐츠: 메인 로고 및 슬로건 */}
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-10 px-6">
         <div 
