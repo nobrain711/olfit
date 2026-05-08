@@ -34,26 +34,49 @@ export default function HeroSection() {
         Framer Motion Glow Effects: 
         은은한 햇빛이나 향기가 번지는 듯한 부드러운 애니메이션 레이어
       */}
-      <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden opacity-30">
+      <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
+        {/* 1번 빛무리: 왼쪽 위에서 크게 일렁임 */}
         <motion.div
+          initial={{ x: 0, y: 0, scale: 1 }}
           animate={{
-            x: [0, 100, -50],
-            y: [0, 50, 100],
-            scale: [1, 1.2, 1],
+            x: [0, 400, -200, 0], // 이동 반경을 확 늘림
+            y: [0, 250, 100, 0],
+            scale: [1, 1.3, 1],
           }}
           transition={{
-            duration: 20,
+            duration: 18, // 테스트를 위해 약간 빠르게
             repeat: Infinity,
             repeatType: "mirror",
             ease: "easeInOut",
           }}
-          className="absolute -top-[10%] -left-[10%] w-[600px] h-[600px] bg-cream/20 rounded-full blur-[120px]"
+          // 부모 opacity를 빼고 자식에서 투명도를 조절 (일단 잘 보이게 40%로 세팅)
+          className="absolute -top-[20%] -left-[10%] w-[600px] h-[600px] bg-cream/40 rounded-full blur-[120px]"
         />
+        
+        {/* 2번 빛무리: 오른쪽 위에서 은은하게 교차 */}
         <motion.div
+          initial={{ x: 0, y: 0, scale: 1 }}
           animate={{
-            x: [0, -80, 60],
-            y: [0, 120, -40],
-            scale: [1, 1.1, 0.9],
+            x: [0, -350, 200, 0],
+            y: [0, 300, -100, 0],
+            scale: [1, 1.2, 0.9, 1],
+          }}
+          transition={{
+            duration: 22,
+            repeat: Infinity,
+            repeatType: "mirror",
+            ease: "easeInOut",
+            delay: 1, // 딜레이를 약간 짧게
+          }}
+          className="absolute top-[10%] -right-[15%] w-[500px] h-[500px] bg-orange-200/30 rounded-full blur-[100px]"
+        />
+        
+        {/* 3번 빛무리: 하단에서 위로 솟아오르는 느낌 */}
+        <motion.div
+          initial={{ x: 0, y: 0 }}
+          animate={{
+            x: [0, 250, -300, 0],
+            y: [0, -400, 150, 0],
           }}
           transition={{
             duration: 25,
@@ -62,21 +85,7 @@ export default function HeroSection() {
             ease: "easeInOut",
             delay: 2,
           }}
-          className="absolute top-[20%] -right-[15%] w-[500px] h-[500px] bg-orange-200/10 rounded-full blur-[100px]"
-        />
-        <motion.div
-          animate={{
-            x: [0, 40, -100],
-            y: [0, -60, 80],
-          }}
-          transition={{
-            duration: 18,
-            repeat: Infinity,
-            repeatType: "mirror",
-            ease: "easeInOut",
-            delay: 5,
-          }}
-          className="absolute -bottom-[10%] left-[20%] w-[700px] h-[700px] bg-cream/15 rounded-full blur-[150px]"
+          className="absolute -bottom-[20%] left-[20%] w-[700px] h-[700px] bg-cream/30 rounded-full blur-[150px]"
         />
       </div>
 
