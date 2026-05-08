@@ -59,7 +59,7 @@ export default function ProductCarousel({ products, onProductClick }: ProductCar
                     <div className="space-y-4 mb-8">
                       <div>
                         <span className="text-[10px] uppercase tracking-widest text-wood/30 group-hover:text-cream/30 block mb-1 transition-colors">Notes</span>
-                        <p className="text-sm text-wood/70 group-hover:text-cream/70 line-clamp-2 break-keep transition-colors">
+                        <p className="text-sm text-wood/70 group-hover:text-cream/70 line-clamp-2 break-keep text-balance transition-colors">
                           {item.notes}
                         </p>
                       </div>
