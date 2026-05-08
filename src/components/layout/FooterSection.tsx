@@ -143,17 +143,17 @@ export default function FooterSection() {
         </div>
       </div>
 
-      {/* 푸터 전용 미니 모달 오버레이 - 안정성 최우선 레이어링 */}
+      {/* 푸터 전용 미니 모달 오버레이 - 렌더링 증발 버그 해결 및 구조 최적화 */}
       {modalContent && (
-        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
-          {/* 백드롭: 어두운 투명 배경 */}
+        <div 
+          className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={() => setModalContent(null)}
+        >
+          {/* 모달 컨텐츠: 클릭 이벤트 버블링 방지 (배경을 클릭했을 때만 닫히도록 설정) */}
           <div 
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setModalContent(null)} 
-          />
-
-          {/* 모달 컨텐츠: 명시적 최상위 레이어 및 불투명 배경 강제 */}
-          <div className="relative z-[10001] bg-white border border-wood/20 p-8 md:p-12 w-full max-w-lg shadow-2xl rounded-sm">
+            className="relative bg-white border border-wood/20 p-8 md:p-12 w-full max-w-lg shadow-2xl rounded-sm"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button 
               onClick={() => setModalContent(null)}
               className="absolute top-4 right-4 p-2 text-wood/40 hover:text-wood transition-colors"
