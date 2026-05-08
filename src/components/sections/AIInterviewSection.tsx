@@ -89,9 +89,6 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
             <p className="mt-6 text-cream/40 text-[13px] max-w-xl mx-auto break-keep">
               업로드하신 사진과 선택하신 원료를 기반으로 Olfit AI가 <br className="hidden sm:inline" /> 
               당신만의 고유한 향기 아우라를 정교하게 분석합니다.
-              <br /><br />
-              정면 전신사진 혹은 의상의 질감과 색상이 잘 드러나는 사진일수록 더욱 정교한 분석이 가능합니다. <br />
-              업로드된 이미지는 분석 즉시 경량화되어 안전하게 처리됩니다.
             </p>
 
             {!isComplete && !isAnalyzing && selectedNotes.length === 0 && (

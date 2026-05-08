@@ -150,7 +150,7 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
       <div className="mt-6 flex items-start gap-3 px-2">
         <ImageIcon size={14} className="text-cream/30 mt-0.5" />
         <p className="text-[11px] text-cream/40 leading-relaxed break-keep">
-          정면 전신사진 혹은 의상의 질감과 색상이 잘 드러나는 사진일수록 더욱 정교한 분석이 가능합니다. 업로드된 이미지는 분석 즉시 경량화되어 안전하게 처리됩니다.
+          정면 전신사진 혹은 의상의 질감과 색상이 잘 드러나는 사진일수록 더욱 정교한 분석이 가능합니다. <br />업로드된 이미지는 분석 즉시 경량화되어 안전하게 처리됩니다.
         </p>
       </div>
     </div>
