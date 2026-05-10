@@ -81,12 +81,15 @@ export function getRecommendedProducts(results: AnalysisResults | null): (Produc
     }
 
     // 정량적 점수를 백분율(0-100%) 유사도로 변환 및 보정
-    const maxPossibleScore = (selectedNotes.length * 2) + (perfumeKeywords.length * 2) || 1.5;
+    const maxPossibleScore = (selectedNotes.length * 2) + (perfumeKeywords.length * 2) || 4;
     const rawSimilarity = (score / maxPossibleScore) * 100;
     
     // 데이터 쏠림 방지를 위한 안정적인 난수 보정값 추가 (시각적 다양성 확보)
-    const stableRandom = (product.id % 10) / 10;
-    const similarity = Math.min(Math.round(rawSimilarity * 0.3 + 65 + stableRandom), 98);
+    // 제품 ID를 기반으로 2~7% 정도의 추가 변동성을 주어 변별력을 높임
+    const stableRandom = (product.id % 70) / 10; 
+    
+    // 변별력을 위해 기본 점수를 60으로 낮추고, 가중치를 0.35로 조정하여 수치가 더 들쭉날쭉하게 나오도록 함
+    const similarity = Math.min(Math.round(rawSimilarity * 0.35 + 60 + stableRandom), 99);
     
     return { ...product, similarity, matchReason };
   });
