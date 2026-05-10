@@ -76,6 +76,7 @@ export default function ProductCarousel({ products, onProductClick, slots }: Pro
                       src={item.image} 
                       alt={item.name} 
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
+                      loading="lazy"
                     />
                     <div className="absolute top-4 right-4 bg-wood/80 text-cream px-3 py-1 rounded-full text-[10px] font-mono group-hover:bg-cream group-hover:text-wood transition-colors">
                       {item.similarity}% Match

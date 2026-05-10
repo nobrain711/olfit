@@ -5,19 +5,24 @@
  */
 
 import { useOlfitStore } from "@/store/useStore";
+import { lazy, Suspense } from "react";
 import Navigation from "@/components/layout/Navigation";
-import HeroSection from "@/components/sections/HeroSection";
-import PhilosophySection from "@/components/sections/PhilosophySection";
-import ScentGuideSection from "@/components/sections/ScentGuideSection";
-import AIInterviewSection from "@/components/sections/AIInterviewSection";
-import InsightReportSection from "@/components/sections/InsightReportSection";
-import SafetyValuesSection from "@/components/sections/SafetyValuesSection";
+import { SectionSkeleton } from "@/components/common/Skeleton";
+import ErrorBoundary from "@/components/common/ErrorBoundary";
 import FooterSection from "@/components/layout/FooterSection";
 import FloatingNavButton from "@/components/common/FloatingNavButton";
 import PrivacyConsentModal from "@/components/common/PrivacyConsentModal";
 import ProductModal from "@/components/curated/ProductModal";
 
 import type { AnalysisResults } from "@/types";
+
+// 지연 로딩을 위한 섹션 컴포넌트 정의
+const HeroSection = lazy(() => import("@/components/sections/HeroSection"));
+const PhilosophySection = lazy(() => import("@/components/sections/PhilosophySection"));
+const ScentGuideSection = lazy(() => import("@/components/sections/ScentGuideSection"));
+const AIInterviewSection = lazy(() => import("@/components/sections/AIInterviewSection"));
+const InsightReportSection = lazy(() => import("@/components/sections/InsightReportSection"));
+const SafetyValuesSection = lazy(() => import("@/components/sections/SafetyValuesSection"));
 
 export default function App() {
   const { 
@@ -63,22 +68,48 @@ export default function App() {
       */}
       <div className={`transition-all duration-700 ${!hasConsented ? "blur-xl scale-[1.02] pointer-events-none select-none" : "blur-0"}`}>
         <main>
-          {/* 섹션별 순차 배치 */}
-          <HeroSection />
-          <PhilosophySection />
-          <ScentGuideSection onNotesChange={setSelectedNotes} />
+          {/* 섹션별 독립적 Suspense/ErrorBoundary 배치로 인지 성능 및 안정성 극대화 */}
+          <Suspense fallback={<SectionSkeleton />}>
+            <ErrorBoundary fallbackMessage="Hero 섹션을 불러오지 못했습니다.">
+              <HeroSection />
+            </ErrorBoundary>
+          </Suspense>
+
+          <Suspense fallback={<SectionSkeleton />}>
+            <ErrorBoundary fallbackMessage="철학 섹션을 불러오지 못했습니다.">
+              <PhilosophySection />
+            </ErrorBoundary>
+          </Suspense>
+
+          <Suspense fallback={<SectionSkeleton />}>
+            <ErrorBoundary fallbackMessage="가이드 섹션을 불러오지 못했습니다.">
+              <ScentGuideSection onNotesChange={setSelectedNotes} />
+            </ErrorBoundary>
+          </Suspense>
           
-          <AIInterviewSection 
-            onComplete={(results: AnalysisResults) => setAnalysisResults(results)} 
-            selectedNotes={selectedNotes}
-          />
+          <Suspense fallback={<SectionSkeleton />}>
+            <ErrorBoundary fallbackMessage="인터뷰 섹션을 불러오지 못했습니다.">
+              <AIInterviewSection 
+                onComplete={(results: AnalysisResults) => setAnalysisResults(results)} 
+                selectedNotes={selectedNotes}
+              />
+            </ErrorBoundary>
+          </Suspense>
           
-          <InsightReportSection 
-            results={analysisResults} 
-            onProductClick={setSelectedProduct}
-          />
+          <Suspense fallback={<SectionSkeleton />}>
+            <ErrorBoundary fallbackMessage="리포트 섹션을 불러오지 못했습니다.">
+              <InsightReportSection 
+                results={analysisResults} 
+                onProductClick={setSelectedProduct}
+              />
+            </ErrorBoundary>
+          </Suspense>
           
-          <SafetyValuesSection />
+          <Suspense fallback={<SectionSkeleton />}>
+            <ErrorBoundary fallbackMessage="안전 가치 섹션을 불러오지 못했습니다.">
+              <SafetyValuesSection />
+            </ErrorBoundary>
+          </Suspense>
         </main>
         
         {/* 글로벌 푸터 */}
