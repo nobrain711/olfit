@@ -18,6 +18,10 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_INITDB_SKIP_TZINFO: ${MYSQL_INITDB_SKIP_TZINFO}
+      SQL_DB_NAME: ${SQL_DB_NAME}
+      SQL_TEST_DB_NAME: ${SQL_TEST_DB_NAME:-test_olfit_db}
+      SQL_DB_USER: ${SQL_DB_USER:-olfit_admin}
+      SQL_DB_PASSWORD: ${SQL_DB_PASSWORD:-olfit_password}
       TZ: ${TZ}
     ports:
       - "3307:3306"
