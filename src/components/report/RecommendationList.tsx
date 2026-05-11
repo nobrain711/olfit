@@ -22,6 +22,7 @@ export default function RecommendationList({
   onSortChange 
 }: RecommendationListProps) {
   const sortButtonClass = "h-8 min-w-[72px] px-5 inline-flex items-center justify-center rounded-full text-[10px] leading-none font-medium uppercase tracking-widest [text-indent:0.15em] transition-all";
+  const sortLabelClass = "inline-block leading-none translate-y-px";
 
   return (
     <div className="mt-32 pt-24 border-t border-wood/10">
@@ -33,8 +34,9 @@ export default function RecommendationList({
             className={`${sortButtonClass} ${
               sortBy === "recommended" ? "bg-wood text-cream shadow-md" : "text-wood/40 hover:text-wood"
             }`}
+            data-capture-pill="sort"
           >
-            추천순
+            <span className={sortLabelClass}>추천순</span>
           </button>
           <button
             type="button"
@@ -42,8 +44,9 @@ export default function RecommendationList({
             className={`${sortButtonClass} ${
               sortBy === "price" ? "bg-wood text-cream shadow-md" : "text-wood/40 hover:text-wood"
             }`}
+            data-capture-pill="sort"
           >
-            가격순
+            <span className={sortLabelClass}>가격순</span>
           </button>
         </div>
 

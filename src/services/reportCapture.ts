@@ -98,6 +98,45 @@ const injectCaptureStyles = (clonedDoc: Document) => {
   clonedDoc.head.appendChild(style);
 };
 
+const normalizeCapturePills = (root: ParentNode) => {
+  root.querySelectorAll<HTMLElement>("[data-capture-pill]").forEach((pill) => {
+    const type = pill.dataset.capturePill;
+
+    pill.style.display = "inline-flex";
+    pill.style.alignItems = "center";
+    pill.style.justifyContent = "center";
+    pill.style.boxSizing = "border-box";
+    pill.style.lineHeight = "1";
+    pill.style.paddingTop = "0";
+    pill.style.paddingBottom = "0";
+    pill.style.whiteSpace = "nowrap";
+
+    if (type === "sort") {
+      pill.style.height = "32px";
+      pill.style.minWidth = "72px";
+      pill.style.borderRadius = "9999px";
+    } else if (type === "match") {
+      pill.style.height = "28px";
+      pill.style.minWidth = "74px";
+      pill.style.borderRadius = "9999px";
+    } else if (type === "best") {
+      pill.style.height = "24px";
+      pill.style.minWidth = "78px";
+    }
+
+    const label = pill.firstElementChild;
+    if (label instanceof HTMLElement) {
+      label.style.display = "inline-block";
+      label.style.lineHeight = "1";
+      label.style.position = "relative";
+      label.style.top = "1px";
+      if (type !== "match") {
+        label.style.textIndent = "0.15em";
+      }
+    }
+  });
+};
+
 const prependCaptureHeader = (clonedDoc: Document, el: HTMLElement) => {
   const header = clonedDoc.createElement("div");
   header.style.cssText = "display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:60px; border-bottom:1px solid rgba(107,68,35,0.1); padding-bottom:20px;";
@@ -182,6 +221,7 @@ export const captureReportBlob = async (reportElement: HTMLElement | null): Prom
         el.style.opacity = "1";
 
         prependCaptureHeader(clonedDoc, el);
+        normalizeCapturePills(el);
         await waitForImages(el);
         await waitForNextPaint();
       }

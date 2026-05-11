@@ -25,12 +25,15 @@ interface InsightReportSectionProps {
   onProductClick: (product: Product) => void;
 }
 
+const fallbackRadarAdjustments = [0.06, 0.03, 0.08, 0.05, 0.02];
+
 export default function InsightReportSection({ results, onProductClick }: InsightReportSectionProps) {
   const { ref: refHeader, isVisible: visHeader } = useIntersectionObserver();
   const { ref: refRadar, isVisible: visRadar } = useIntersectionObserver();
   const { ref: refSteps, isVisible: visSteps } = useIntersectionObserver();
   const { ref: refPyramid, isVisible: visPyramid } = useIntersectionObserver();
   const reportRef = useRef<HTMLDivElement>(null);
+  const isCapturingRef = useRef(false);
 
   const [sortBy, setSortBy] = useState<"recommended" | "price">("recommended");
   const [isSaving, setIsSaving] = useState(false);
@@ -80,18 +83,18 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
       { axis: "오리엔탈", value: scores?.["오리엔탈"] ?? 0.3 },
       { axis: "프레시", value: scores?.["프레시"] ?? 0.4 },
       { axis: "구르망", value: scores?.["구르망"] ?? 0.2 },
-    ].map(d => ({
+    ].map((d, index) => ({
       ...d,
       description: radarData.find(rd => rd.axis === d.axis)?.description,
-      // API 데이터가 있으면 그대로 쓰고, 없으면 랜덤 보정값 사용
-      value: scores ? d.value : Math.max(0.1, Math.min(0.95, d.value + (Math.random() * 0.1)))
+      value: scores ? d.value : Math.max(0.1, Math.min(0.95, d.value + fallbackRadarAdjustments[index]))
     }));
   }, [results]);
 
   const theme = { bg: "bg-cream", accent: "text-wood", border: "border-wood/10" };
 
   const handleShareResults = async () => {
-    if (isSaving) return;
+    if (isCapturingRef.current) return;
+    isCapturingRef.current = true;
     setIsSaving(true);
     try {
       const blob = await captureReportBlob(reportRef.current);
@@ -107,6 +110,7 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
     } catch (err) {
       console.error("Report processing error:", err);
     } finally {
+      isCapturingRef.current = false;
       setIsSaving(false);
     }
   };

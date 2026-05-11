@@ -77,8 +77,11 @@ export default function ProductCarousel({ products, onProductClick, slots }: Pro
                       alt={item.name} 
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
                     />
-                    <div className="absolute top-4 right-4 h-7 min-w-[74px] px-3 inline-flex items-center justify-center rounded-full bg-wood/80 text-cream text-[10px] leading-none font-mono group-hover:bg-cream group-hover:text-wood transition-colors">
-                      {item.similarity}% Match
+                    <div
+                      className="absolute top-4 right-4 h-7 min-w-[74px] px-3 inline-flex items-center justify-center rounded-full bg-wood/80 text-cream text-[10px] leading-none font-mono group-hover:bg-cream group-hover:text-wood transition-colors"
+                      data-capture-pill="match"
+                    >
+                      <span className="inline-block leading-none translate-y-px">{item.similarity}% Match</span>
                     </div>
                   </div>
                   
@@ -112,7 +115,10 @@ export default function ProductCarousel({ products, onProductClick, slots }: Pro
 
                     {/* 베스트 추천 표시 */}
                     {index === 0 && (
-                      <div className="h-6 min-w-[78px] px-2 inline-flex items-center justify-center bg-wood/10 border border-wood/20 rounded-sm mb-3 group-hover:bg-cream/10 group-hover:border-cream/30 transition-colors">
+                      <div
+                        className="h-6 min-w-[78px] px-2 inline-flex items-center justify-center bg-wood/10 border border-wood/20 rounded-sm mb-3 group-hover:bg-cream/10 group-hover:border-cream/30 transition-colors"
+                        data-capture-pill="best"
+                      >
                         <span className="text-[9px] leading-none font-bold text-wood group-hover:text-cream tracking-[0.15em] uppercase [text-indent:0.15em]">Best Pick</span>
                       </div>
                     )}
