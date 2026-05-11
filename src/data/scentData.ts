@@ -4,7 +4,7 @@
  * 각 계열의 특징과 대표 성분, 부향률별 지속시간 정보를 포함합니다.
  */
 
-import { Leaf, Mountain, Sun, Sparkles, Wind, Cookie } from "lucide-react";
+import { Leaf, Mountain, Sparkles, Wind, Cookie } from "lucide-react";
 
 /**
  * 향기 계열에 대한 총괄 설명
