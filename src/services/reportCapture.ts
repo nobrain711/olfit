@@ -6,6 +6,116 @@
 
 import html2canvas from "html2canvas";
 
+const CAPTURE_BACKGROUND = "#FDFCF0";
+const CAPTURE_WIDTH = 1000;
+const CAPTURE_VIEWPORT_WIDTH = 1200;
+const CAPTURE_TIMEOUT = 45000;
+const IMAGE_LOAD_TIMEOUT = 15000;
+
+const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+const waitForNextPaint = () =>
+  new Promise<void>((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => resolve());
+    });
+  });
+
+const waitForImage = async (img: HTMLImageElement, timeout = IMAGE_LOAD_TIMEOUT): Promise<boolean> => {
+  if (!img.src && !img.currentSrc) return true;
+
+  const decode = async () => {
+    try {
+      await img.decode?.();
+    } catch {
+      // decode() can reject for cached/SVG images even after a successful load.
+    }
+  };
+
+  if (img.complete && img.naturalWidth > 0) {
+    await decode();
+    return true;
+  }
+
+  const loaded = await new Promise<boolean>((resolve) => {
+    const handleLoad = () => {
+      cleanup();
+      resolve(img.naturalWidth > 0);
+    };
+    const handleError = () => {
+      cleanup();
+      resolve(false);
+    };
+
+    const cleanup = () => {
+      window.clearTimeout(timer);
+      img.removeEventListener("load", handleLoad);
+      img.removeEventListener("error", handleError);
+    };
+
+    const timer = window.setTimeout(() => {
+      cleanup();
+      resolve(false);
+    }, timeout);
+
+    img.addEventListener("load", handleLoad, { once: true });
+    img.addEventListener("error", handleError, { once: true });
+  });
+
+  if (loaded) await decode();
+  return loaded;
+};
+
+const waitForImages = async (root: ParentNode, timeout = IMAGE_LOAD_TIMEOUT) => {
+  const images = Array.from(root.querySelectorAll("img"));
+  await Promise.all(images.map((img) => waitForImage(img, timeout)));
+};
+
+const injectCaptureStyles = (clonedDoc: Document) => {
+  const style = clonedDoc.createElement("style");
+  style.textContent = `
+    #report-content,
+    #report-content * {
+      animation: none !important;
+      transition-delay: 0s !important;
+      transition-duration: 0s !important;
+    }
+
+    #report-content {
+      opacity: 1 !important;
+      filter: none !important;
+      transform: none !important;
+      background: ${CAPTURE_BACKGROUND} !important;
+      color: #3D2B1F !important;
+    }
+
+    #report-content img {
+      opacity: 1 !important;
+      filter: none !important;
+      image-rendering: auto !important;
+    }
+  `;
+  clonedDoc.head.appendChild(style);
+};
+
+const prependCaptureHeader = (clonedDoc: Document, el: HTMLElement) => {
+  const header = clonedDoc.createElement("div");
+  header.style.cssText = "display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:60px; border-bottom:1px solid rgba(107,68,35,0.1); padding-bottom:20px;";
+  header.innerHTML = `
+    <div style="display: flex; align-items: center;">
+      <div>
+        <div style="font-family: 'Playfair Display', serif; font-size:28px; font-weight: 300; letter-spacing: 0.25em; color:#6B4423; text-transform: uppercase; line-height: 1;">OLFIT</div>
+        <div style="font-size: 10px; color: #6B4423; margin-top: 8px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;">Visual Identity Matching</div>
+      </div>
+    </div>
+    <div style="text-align: right;">
+      <div style="font-size: 11px; font-weight: 600; color: #6B4423; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px;">Precision Analysis Report</div>
+      <div style="font-size:10px; color:rgba(107, 68, 35, 0.5); letter-spacing: 0.05em;">${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</div>
+    </div>
+  `;
+  el.prepend(header);
+};
+
 /**
  * 리포트 요소를 캡처하여 Blob 형태의 고해상도 이미지를 생성합니다.
  * 
@@ -15,9 +125,9 @@ import html2canvas from "html2canvas";
 export const captureReportBlob = async (reportElement: HTMLElement | null): Promise<Blob | null> => {
   if (!reportElement) return null;
 
-  // 15초 타임아웃 설정
+  // 원본 DOM, 클론 DOM, html2canvas 내부 이미지 로딩까지 기다릴 수 있도록 여유를 둡니다.
   const overallTimeout = new Promise<null>((_, reject) => 
-    setTimeout(() => reject(new Error("Capture Timeout")), 15000)
+    setTimeout(() => reject(new Error("Capture Timeout")), CAPTURE_TIMEOUT)
   );
 
   const captureProcess = (async () => {
@@ -25,101 +135,55 @@ export const captureReportBlob = async (reportElement: HTMLElement | null): Prom
     if (document.fonts) await document.fonts.ready;
     
     // 이미지 로딩 대기
-    const images = reportElement.querySelectorAll("img");
-    await Promise.all(Array.from(images).map(img => {
-      if (img.complete) return Promise.resolve();
-      return new Promise(resolve => {
-        img.onload = resolve;
-        img.onerror = resolve;
-        setTimeout(resolve, 5000);
-      });
-    }));
+    await waitForImages(reportElement);
 
     // 안정적인 렌더링을 위한 지연
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await wait(1000);
+    await waitForNextPaint();
 
     const canvas = await html2canvas(reportElement, {
-      backgroundColor: "#FDFCF0",
-      scale: 2,
+      backgroundColor: CAPTURE_BACKGROUND,
+      scale: Math.min(3, Math.max(2, window.devicePixelRatio || 2)),
       useCORS: true,
-      allowTaint: true,
+      allowTaint: false,
       logging: false,
-      imageTimeout: 15000,
+      imageTimeout: IMAGE_LOAD_TIMEOUT,
       scrollX: 0,
       scrollY: -window.scrollY,
+      windowWidth: CAPTURE_VIEWPORT_WIDTH,
+      windowHeight: Math.max(reportElement.scrollHeight, window.innerHeight),
       onclone: async (clonedDoc) => {
         const el = clonedDoc.getElementById("report-content");
         if (!el) return;
-        
-        // 클론된 DOM에서 이미지 플레이스홀더 교체 및 스타일 최적화
+
+        injectCaptureStyles(clonedDoc);
+
+        // 클론 DOM은 애니메이션이 처음부터 다시 시작되므로, 캡처용으로 즉시 최종 상태에 고정합니다.
+        el.getAnimations?.({ subtree: true }).forEach((animation) => {
+          try {
+            animation.finish();
+          } catch {
+            // Infinite animations cannot be finished; disabling CSS animations above handles them.
+          }
+        });
+
+        // 원본 상품 이미지를 유지해야 선명하게 저장됩니다. 로딩만 eager/sync로 고정합니다.
         const clonedImages = el.querySelectorAll("img");
         clonedImages.forEach((img) => {
-          if (img.src.startsWith("data:")) {
-            img.style.display = "none";
-            return;
-          }
-
-          const parent = img.parentElement;
-          if (!parent) return;
-
-          const family = img.closest("[data-family]")?.getAttribute("data-family") || "기본";
-          const themes: Record<string, { bg: string; color: string; image: string }> = {
-            "플로랄": { bg: "#FAE8EF", color: "#A03060", image: "/product_1.jpg" },
-            "우디": { bg: "#EDE8E0", color: "#7A5C3A", image: "/product_2.jpg" },
-            "머스크": { bg: "#E8EAF0", color: "#4A5070", image: "/product_1.jpg" },
-            "시트러스": { bg: "#FEF5E0", color: "#8A6010", image: "/product_4.jpg" },
-            "앰버": { bg: "#F5EAD8", color: "#8A5520", image: "/product_3.jpg" },
-            "프레쉬": { bg: "#E4F2EC", color: "#2A6B4A", image: "/product_4.jpg" },
-            "기본": { bg: "#F0EDE8", color: "#6B4423", image: "/product_1.jpg" },
-          };
-          const theme = themes[family] || themes["기본"];
-
-          const placeholder = clonedDoc.createElement("div");
-          placeholder.style.cssText = `
-            width: 100%; height: 100%; background-color: ${theme.bg};
-            color: ${theme.color}; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; position: relative;
-            overflow: hidden; border-radius: 2px;
-          `;
-
-          const bgImg = clonedDoc.createElement("img");
-          bgImg.src = window.location.origin + theme.image;
-          bgImg.style.cssText = `position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;`;
-          placeholder.appendChild(bgImg);
-
-          const overlay = clonedDoc.createElement("div");
-          overlay.style.cssText = `position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: ${theme.bg}; opacity: 0.8; z-index: 1;`;
-          placeholder.appendChild(overlay);
-
-          const badge = clonedDoc.createElement("div");
-          badge.textContent = family;
-          badge.style.cssText = `font-size: 11px; font-weight: 600; letter-spacing: 0.15em; border: 1px solid ${theme.color}; border-radius: 999px; padding: 5px 14px; background-color: rgba(255, 255, 255, 0.2); position: relative; z-index: 3; text-transform: uppercase; margin-top: auto; margin-bottom: 24px;`;
-          placeholder.appendChild(badge);
-
-          img.style.display = "none";
-          parent.appendChild(placeholder);
+          img.loading = "eager";
+          img.decoding = "sync";
         });
         
-        el.style.width = "1000px";
+        el.style.width = `${CAPTURE_WIDTH}px`;
+        el.style.maxWidth = "none";
         el.style.padding = "60px";
         el.style.filter = "none";
         el.style.transform = "none";
+        el.style.opacity = "1";
 
-        const header = clonedDoc.createElement("div");
-        header.style.cssText = "display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:60px; border-bottom:1px solid rgba(107,68,35,0.1); padding-bottom:20px;";
-        header.innerHTML = `
-          <div style="display: flex; align-items: center;">
-            <div>
-              <div style="font-family: 'Playfair Display', serif; font-size:28px; font-weight: 300; letter-spacing: 0.25em; color:#6B4423; text-transform: uppercase; line-height: 1;">OLFIT</div>
-              <div style="font-size: 10px; color: #6B4423; margin-top: 8px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;">Visual Identity Matching</div>
-            </div>
-          </div>
-          <div style="text-align: right;">
-            <div style="font-size: 11px; font-weight: 600; color: #6B4423; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px;">Precision Analysis Report</div>
-            <div style="font-size:10px; color:rgba(107, 68, 35, 0.5); letter-spacing: 0.05em;">${new Date().toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}</div>
-          </div>
-        `;
-        el.prepend(header);
+        prependCaptureHeader(clonedDoc, el);
+        await waitForImages(el);
+        await waitForNextPaint();
       }
     });
 
