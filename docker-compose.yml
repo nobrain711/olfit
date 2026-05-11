@@ -1,9 +1,10 @@
+name: olfit
+
 services:
   database:
     build:
       context: ./database
       dockerfile: Dockerfile
-    container_name: django_docker_playground_database
     cgroup: host
     cpus: ${DATABASE_CPUS}
     mem_limit: ${DATABASE_MEMORY_LIMIT}
@@ -43,7 +44,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: django_docker_playground_backend
     env_file:
       - path: .env
         required: false
@@ -89,7 +89,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: django_docker_playground_frontend
     env_file:
       - path: .env
         required: false
