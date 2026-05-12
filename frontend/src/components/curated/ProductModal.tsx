@@ -81,7 +81,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
               </div>
               <div className="flex items-start gap-4">
                 <span className="text-[10px] uppercase tracking-widest text-wood/40 mt-1 w-12">Mid</span>
-                <p className="text-sm font-medium">{product.details.heartNotes.join(", ")}</p>
+                <p className="text-sm font-medium">{product.details.middleNotes.join(", ")}</p>
               </div>
               <div className="flex items-start gap-4">
                 <span className="text-[10px] uppercase tracking-widest text-wood/40 mt-1 w-12">Base</span>

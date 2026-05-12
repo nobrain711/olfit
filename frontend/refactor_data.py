@@ -94,7 +94,7 @@ def refactor():
     details: {{
       story: "{story}",
       topNotes: {json.dumps(transform_notes(topNotes), ensure_ascii=False)},
-      heartNotes: {json.dumps(transform_notes(middleNotes), ensure_ascii=False)},
+      middleNotes: {json.dumps(transform_notes(middleNotes), ensure_ascii=False)},
       baseNotes: {json.dumps(transform_notes(baseNotes), ensure_ascii=False)},
       bestFor: "{bestFor}"
     }}

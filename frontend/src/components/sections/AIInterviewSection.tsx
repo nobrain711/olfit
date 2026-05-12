@@ -34,7 +34,7 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
     { threshold: 90, text: "최적의 향기 아우라 생성 완료" },
   ];
 
-  const handleImageProcessed = (base64: string, remoteUrl: string) => {
+  const handleImageProcessed = (base64: string) => {
     setLastProcessedBase64(base64);
     setLoading(true);
     setError(null);
@@ -77,7 +77,7 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
 
   const handleRetry = () => {
     if (lastProcessedBase64) {
-      handleImageProcessed(lastProcessedBase64, "retry-mock-url");
+      handleImageProcessed(lastProcessedBase64);
     }
   };
 

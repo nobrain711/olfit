@@ -35,7 +35,7 @@ export function getRecommendedProducts(results: AnalysisResults | null): (Produc
       const targetText = `
         ${product.notes.toLowerCase()} 
         ${product.details.topNotes.join(", ").toLowerCase()} 
-        ${product.details.heartNotes.join(", ").toLowerCase()} 
+        ${product.details.middleNotes.join(", ").toLowerCase()} 
         ${product.details.baseNotes.join(", ").toLowerCase()}
       `.replace(/\s+/g, '');
       

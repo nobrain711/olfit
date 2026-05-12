@@ -34,7 +34,7 @@ export interface Product {
   details: {
     story: string; // 향수의 탄생 스토리 또는 분위기 설명
     topNotes: string[]; // 탑 노트 상세
-    heartNotes: string[]; // 미들(하트) 노트 상세
+    middleNotes: string[]; // 미들(하트) 노트 상세
     baseNotes: string[]; // 베이스 노트 상세
     bestFor: string; // 추천 어울리는 순간/룩
   };
