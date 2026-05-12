@@ -71,7 +71,7 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
           setIsUploading(false);
           
           onImageProcessed(base64, remoteUrl);
-        } catch (err) {
+        } catch {
           setError("이미지 처리 중 오류가 발생했습니다.");
           setIsUploading(false);
         }

@@ -1,9 +1,15 @@
 import RadarChart from "@/components/common/RadarChart";
 
+interface RadarDataPoint {
+  axis: string;
+  value: number;
+  description?: string;
+}
+
 interface AuraAnalysisProps {
   isRadarVisible: boolean;
   isStepsVisible: boolean;
-  radarData: any[];
+  radarData: RadarDataPoint[];
   logicSteps: string[];
   borderClass: string;
 }

@@ -32,6 +32,15 @@ api.interceptors.response.use(
   }
 );
 
+// Request Interceptor: 세션 ID 및 공통 헤더 주입
+api.interceptors.request.use((config) => {
+  const sessionId = localStorage.getItem("olfit_session_id");
+  if (sessionId) {
+    config.headers['X-Session-ID'] = sessionId;
+  }
+  return config;
+});
+
 /**
  * AI 아우라 분석 요청을 백엔드로 전송합니다.
  */

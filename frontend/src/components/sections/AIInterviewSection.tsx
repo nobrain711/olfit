@@ -10,6 +10,7 @@ import ImageUploader from "@/components/common/ImageUploader";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import ErrorFallback from "@/components/common/ErrorFallback";
 import { useOlfitStore } from "@/store/useStore";
+import { requestAuraAnalysis } from "@/services/api";
 import type { AnalysisResults } from "@/types";
 
 interface AIInterviewSectionProps {
@@ -44,7 +45,7 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
     const interval = 100;
     const step = (interval / duration) * 100;
 
-    const timer = setInterval(() => {
+    const timer = setInterval(async () => {
       setProgress((prev) => {
         const next = prev + step;
         const currentStep = analysisSteps.find(s => next <= s.threshold) || analysisSteps[analysisSteps.length - 1];
@@ -52,23 +53,21 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
 
         if (next >= 100) {
           clearInterval(timer);
-          setLoading(false);
-          setIsComplete(true);
           
-          if (onComplete) {
-            onComplete({ 
-              type: "personal", 
-              personalMood: "#현대적 #시크", 
-              perfumeKeywords: ["#우디", "#머스크"],
-              fashionStyle: "미니멀리즘",
-              analysisMetadata: {
-                base64Image: base64,
-                selectedNotes: selectedNotes,
-                radarScores: { "플로랄": 0.2, "우디": 0.8, "앰버": 0.4, "프레시": 0.6, "구르망": 0.1 }
+          // 실제 백엔드 분석 요청
+          requestAuraAnalysis(base64, selectedNotes)
+            .then((realResults) => {
+              setLoading(false);
+              setIsComplete(true);
+              if (onComplete) {
+                onComplete(realResults);
               }
+            })
+            .catch((err) => {
+              setLoading(false);
+              setError(err.message || "분석 중 오류가 발생했습니다.");
             });
-            console.log("Analysis triggered with remote URL:", remoteUrl);
-          }
+            
           return 100;
         }
         return next;
