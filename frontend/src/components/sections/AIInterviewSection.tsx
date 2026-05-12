@@ -33,11 +33,24 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
     { threshold: 90, text: "최적의 향기 아우라 생성 완료" },
   ];
 
+<<<<<<< HEAD
+  const handleImageProcessed = (base64: string, remoteUrl: string) => {
+=======
   const handleImageProcessed = async (base64: string, remoteUrl: string) => {
+>>>>>>> olfit-repo/dev
     setLastProcessedBase64(base64);
     setLoading(true);
     setError(null);
     setProgress(0);
+<<<<<<< HEAD
+    
+    const analysisSteps = getSteps();
+    const duration = 5000; // 시뮬레이션 5초
+    const interval = 100;
+    const step = (interval / duration) * 100;
+
+    const timer = setInterval(() => {
+=======
 
     const analysisSteps = getSteps();
     const duration = 5000; 
@@ -46,10 +59,40 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
 
     // 시각적인 프로그레스 바 업데이트
     const progressTimer = setInterval(() => {
+>>>>>>> olfit-repo/dev
       setProgress((prev) => {
         const next = prev + step;
         const currentStep = analysisSteps.find(s => next <= s.threshold) || analysisSteps[analysisSteps.length - 1];
         setAnalysisStatus(currentStep.text);
+<<<<<<< HEAD
+
+        if (next >= 100) {
+          clearInterval(timer);
+          setLoading(false);
+          setIsComplete(true);
+          
+          if (onComplete) {
+            onComplete({ 
+              type: "personal", 
+              personalMood: "#현대적 #시크", 
+              perfumeKeywords: ["#우디", "#머스크"],
+              fashionStyle: "미니멀리즘",
+              analysisMetadata: {
+                base64Image: base64,
+                selectedNotes: selectedNotes,
+                radarScores: { "플로랄": 0.2, "우디": 0.8, "앰버": 0.4, "프레시": 0.6, "구르망": 0.1 }
+              }
+            });
+            console.log("Analysis triggered with remote URL:", remoteUrl);
+          }
+          return 100;
+        }
+        return next;
+      });
+    }, interval);
+  };
+
+=======
         return next >= 95 ? 95 : next; // API 응답 전까지는 95%에서 대기
       });
     }, interval);
@@ -79,6 +122,7 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
   };
 
 
+>>>>>>> olfit-repo/dev
   const handleRetry = () => {
     if (lastProcessedBase64) {
       handleImageProcessed(lastProcessedBase64, "retry-mock-url");
