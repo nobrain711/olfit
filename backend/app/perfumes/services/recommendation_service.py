@@ -95,18 +95,25 @@ class RecommendationService:
             # 원화 환산 가격 계산 (정렬용)
             price_krw = self._convert_to_krw(p_data.get("price"))
             image_asset = self._image_asset_for(p)
+            notes = p_data.get("representative_notes") or p_data.get("notes", [])
+            accords = p_data.get("accords", [])
+            keywords = p_data.get("keywords", {})
+            detail_payload = self._detail_payload_for(p, p_data)
+            image_payload = self._image_payload_for(image_asset)
             
             ranked_results.append({
                 "id": p.id,
                 "name": p.korean_name,
                 "brand": p.brand.name,
-                "price": p_data.get("price", {}).get("raw", "정보없음"),
+                "price": detail_payload["price"].get("raw", "정보없음") if detail_payload["price"] else "정보없음",
                 "price_krw": price_krw,
                 "size": p_data.get("volume", "N/A"),
-                "image": image_asset.get("backend_path") or image_asset.get("original_url") or p_data.get("image_url", ""),
+                "image": image_payload.get("url", ""),
+                "perfume": detail_payload,
+                "imageDetail": image_payload,
                 "imageAsset": image_asset,
-                "tags": p_data.get("accords", [])[:3],
-                "notes": ", ".join((p_data.get("representative_notes") or p_data.get("notes", []))[:5]),
+                "tags": accords[:3],
+                "notes": ", ".join(notes[:5]),
                 "family": p.family,
                 "category": "Personal",
                 "similarity": similarity_percent,
@@ -116,7 +123,7 @@ class RecommendationService:
                     "topNotes": ", ".join(p_data.get("notes_parsed", {}).get("top", [])),
                     "middleNotes": ", ".join(p_data.get("notes_parsed", {}).get("middle", [])),
                     "baseNotes": ", ".join(p_data.get("notes_parsed", {}).get("base", [])),
-                    "bestFor": ", ".join(p_data.get("keywords", [])[:3])
+                    "bestFor": ", ".join(self._keyword_values(keywords)[:3])
                 }
             })
             
@@ -158,6 +165,66 @@ class RecommendationService:
             "backend_path": image.processed_path,
             "base64": image.base64_data,
         }
+
+    def _detail_payload_for(self, perfume, detail_data):
+        notes = detail_data.get("notes", [])
+        representative_notes = detail_data.get("representative_notes") or notes[:5]
+
+        return {
+            "id": perfume.id,
+            "brand": perfume.brand.name,
+            "koreanName": perfume.korean_name,
+            "englishName": perfume.english_name,
+            "productType": perfume.product_type,
+            "family": perfume.family,
+            "releaseYear": perfume.release_year,
+            "price": detail_data.get("price") or {},
+            "description": detail_data.get("description", ""),
+            "ingredientsRaw": detail_data.get("ingredients_raw", ""),
+            "notes": notes,
+            "representativeNotes": representative_notes,
+            "accords": detail_data.get("accords", []),
+            "keywords": detail_data.get("keywords", {}),
+            "auraProfile": detail_data.get("aura_profile", {}),
+            "volume": detail_data.get("volume", ""),
+            "meta": detail_data.get("meta", {}),
+        }
+
+    def _image_payload_for(self, image_asset):
+        if not image_asset:
+            return {}
+
+        backend_path = image_asset.get("backend_path", "")
+        original_url = image_asset.get("original_url", "")
+        return {
+            "url": self._public_image_url(backend_path) or original_url,
+            "originalUrl": original_url,
+            "backendPath": backend_path,
+            "base64": image_asset.get("base64", ""),
+        }
+
+    def _public_image_url(self, path):
+        static_marker = "/static/"
+        if not path:
+            return ""
+
+        normalized = str(path).replace("\\", "/")
+        if normalized.startswith("/static/"):
+            return normalized
+
+        marker_index = normalized.find(static_marker)
+        if marker_index >= 0:
+            return normalized[marker_index:]
+
+        return ""
+
+    def _keyword_values(self, keywords):
+        if isinstance(keywords, dict):
+            values = keywords.get("ko") or keywords.get("en") or []
+            return values if isinstance(values, list) else []
+        if isinstance(keywords, list):
+            return keywords
+        return []
 
     def _generate_reason(self, matches, main_family):
         """사용자에게 보여줄 매칭 사유 문구를 생성합니다."""
