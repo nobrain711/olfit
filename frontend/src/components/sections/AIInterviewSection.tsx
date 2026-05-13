@@ -33,7 +33,7 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
     { threshold: 90, text: "최적의 향기 아우라 생성 완료" },
   ];
 
-  const handleImageProcessed = async (base64: string, remoteUrl: string) => {
+  const handleImageProcessed = async (base64: string, _remoteUrl: string) => {
     setLastProcessedBase64(base64);
     setLoading(true);
     setError(null);

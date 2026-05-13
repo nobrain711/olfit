@@ -26,7 +26,7 @@ interface InsightReportSectionProps {
 }
 
 export default function InsightReportSection({ results, onProductClick }: InsightReportSectionProps) {
-  const { ref: refHeader, isVisible: visHeader } = useIntersectionObserver();
+  const { ref: refHeader } = useIntersectionObserver();
   const { ref: refRadar, isVisible: visRadar } = useIntersectionObserver();
   const { ref: refSteps, isVisible: visSteps } = useIntersectionObserver();
   const { ref: refPyramid, isVisible: visPyramid } = useIntersectionObserver();

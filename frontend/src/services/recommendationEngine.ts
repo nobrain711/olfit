@@ -8,6 +8,8 @@ import type { AnalysisResults } from "@/types";
 import { personalProducts } from "@/data/personalData";
 import type { Product } from "@/data/productData";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 /**
  * 인터뷰 결과에 따른 최적의 추천 제품 리스트를 반환합니다.
  * 시각적 무드 가중치와 후각적 노트 매칭 가중치를 결합하여 상위 5개를 추출합니다.
@@ -20,33 +22,16 @@ export function getRecommendedProducts(results: AnalysisResults | null): (Produc
 
   // 1. 백엔드에서 전달된 추천 결과가 있으면 최우선 사용 및 데이터 정규화
   if (results.recommendations && Array.isArray(results.recommendations)) {
-    return results.recommendations.map((rec, idx) => ({
-      ...rec,
-      // ID가 문자열인 경우 숫자로 해싱하거나 인덱스 활용하여 충돌 방지
-      id: typeof rec.id === 'number' ? rec.id : (idx + 1000), 
-      brand: rec.brand || "Unknown",
-      name: rec.name || "Unknown",
-      price: rec.price || "정보 없음",
-      size: rec.size || "N/A",
-      image: rec.image || "",
-      tags: Array.isArray(rec.tags) ? rec.tags : [],
-      notes: rec.notes || "",
-      family: rec.family || "프레시",
-      similarity: rec.similarity ?? 90,
-      matchReason: rec.matchReason || "AI가 선정한 당신의 스타일 매칭 향수입니다.",
-      details: rec.details || {
-        story: "",
-        topNotes: "",
-        middleNotes: "",
-        baseNotes: "",
-        bestFor: ""
-      }
-    })) as any;
+    return results.recommendations.map((rec, idx) => normalizeBackendRecommendation(rec, idx)) as any;
   }
 
   // 2. 백엔드 결과가 없는 경우 로컬 데이터 fallback
   const meta = results.analysisMetadata;
   if (!meta) return [];
+  const selectedNotes = Array.isArray(meta.selectedNotes) ? meta.selectedNotes : [];
+  const perfumeKeywords = Array.isArray(results.perfumeKeywords) ? results.perfumeKeywords : [];
+  const mood = results.personalMood || results.fashionStyle || "";
+
   const scoredProducts = personalProducts.map((product) => {
     let score = 0;
     const matchedNotes: string[] = [];
@@ -118,6 +103,65 @@ export function getRecommendedProducts(results: AnalysisResults | null): (Produc
   return scoredProducts
     .sort((a, b) => b.similarity - a.similarity)
     .slice(0, 5);
+}
+
+function normalizeBackendRecommendation(rec: any, idx: number): Product & { similarity: number; matchReason: string } {
+  const perfume = rec.perfume || {};
+  const notes = arrayValue(perfume.representativeNotes).length > 0
+    ? arrayValue(perfume.representativeNotes)
+    : arrayValue(perfume.notes);
+  const accords = arrayValue(perfume.accords);
+  const keywords = keywordValues(perfume.keywords);
+  const fallbackDetails = rec.details || {};
+
+  return {
+    ...rec,
+    id: typeof rec.id === "number" ? rec.id : (idx + 1000),
+    brand: perfume.brand || rec.brand || "Unknown",
+    name: perfume.koreanName || rec.name || perfume.englishName || "Unknown",
+    price: perfume.price?.raw || rec.price || "정보 없음",
+    size: perfume.volume || rec.size || "N/A",
+    image: resolveRecommendationImage(rec),
+    tags: accords.length > 0 ? accords.slice(0, 3) : Array.isArray(rec.tags) ? rec.tags : [],
+    notes: notes.length > 0 ? notes.join(", ") : rec.notes || "",
+    family: perfume.family || rec.family || "프레시",
+    category: "Personal",
+    similarity: rec.similarity ?? 90,
+    matchReason: rec.matchReason || "AI가 선정한 당신의 스타일 매칭 향수입니다.",
+    details: {
+      story: perfume.description || fallbackDetails.story || "",
+      topNotes: notes.join(", ") || fallbackDetails.topNotes || "",
+      middleNotes: fallbackDetails.middleNotes || "",
+      baseNotes: fallbackDetails.baseNotes || "",
+      bestFor: keywords.slice(0, 3).join(", ") || fallbackDetails.bestFor || "",
+    },
+  };
+}
+
+function resolveRecommendationImage(rec: any): string {
+  const base64 = rec.imageDetail?.base64 || rec.imageAsset?.base64;
+  if (base64) {
+    return base64.startsWith("data:image/") ? base64 : `data:image/jpeg;base64,${base64}`;
+  }
+
+  const imageUrl = rec.imageDetail?.url || rec.image || rec.imageDetail?.originalUrl || rec.imageAsset?.original_url || "";
+  if (imageUrl.startsWith("/static/")) {
+    return `${API_BASE_URL}${imageUrl}`;
+  }
+  return imageUrl;
+}
+
+function arrayValue(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+}
+
+function keywordValues(value: unknown): string[] {
+  if (Array.isArray(value)) return arrayValue(value);
+  if (value && typeof value === "object") {
+    const keywords = value as Record<string, unknown>;
+    return arrayValue(keywords.ko).length > 0 ? arrayValue(keywords.ko) : arrayValue(keywords.en);
+  }
+  return [];
 }
 
 // EOF: recommendationEngine.ts
