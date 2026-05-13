@@ -34,12 +34,21 @@ class PerfumeImageMapping:
         }
 
 
+@dataclass(frozen=True)
+class ImageExtractionFailure:
+    brand: str
+    english_name: str
+    image_url: str
+    reason: str
+
+
 @dataclass
 class ExtractionResult:
     created: int = 0
     skipped: int = 0
     failed: int = 0
     images: list[PerfumeImageMapping] = field(default_factory=list)
+    failures: list[ImageExtractionFailure] = field(default_factory=list)
 
 
 CONTENT_TYPE_EXTENSIONS = {
@@ -54,13 +63,42 @@ ALLOWED_EXTENSIONS = {"avif", "gif", "jpeg", "jpg", "png", "webp"}
 
 
 def default_downloader(url: str) -> tuple[bytes, str]:
-    response = requests.get(
+    try:
+        response = requests.get(
+            url,
+            timeout=20,
+            headers={"User-Agent": "olfit-image-extractor/1.0"},
+        )
+        response.raise_for_status()
+        return response.content, response.headers.get("Content-Type", "")
+    except requests.HTTPError as exc:
+        status_code = exc.response.status_code if exc.response is not None else None
+        if status_code != 403:
+            raise
+
+    return scrapling_downloader(url)
+
+
+def scrapling_downloader(url: str) -> tuple[bytes, str]:
+    try:
+        from scrapling.fetchers import Fetcher
+    except ImportError as exc:
+        raise RuntimeError("Scrapling fetchers are not installed") from exc
+
+    page = Fetcher.get(
         url,
-        timeout=20,
-        headers={"User-Agent": "olfit-image-extractor/1.0"},
+        impersonate="chrome",
+        http3=False,
+        stealthy_headers=True,
+        timeout=30,
+        retries=2,
     )
-    response.raise_for_status()
-    return response.content, response.headers.get("Content-Type", "")
+
+    if page.status >= 400:
+        raise RuntimeError(f"Scrapling fetch failed with HTTP {page.status}: {page.reason}")
+
+    content_type = page.headers.get("content-type") or page.headers.get("Content-Type") or ""
+    return page.body, content_type
 
 
 def extract_images_from_raw_dir(
@@ -120,8 +158,29 @@ def extract_images_from_raw_dir(
                 result.images.append(
                     build_image_mapping(record, image_url, image_path, clock, perfume_detail_id_resolver)
                 )
-            except Exception:
+            except Exception as exc:
                 result.failed += 1
+                result.images.append(
+                    PerfumeImageMapping(
+                        perfume_detail_id=resolve_perfume_detail_id(record, perfume_detail_id_resolver),
+                        original_url=image_url,
+                        processed_path="",
+                        updated_at=clock(),
+                    )
+                )
+                result.failures.append(
+                    ImageExtractionFailure(
+                        brand=str(record.get("brand") or ""),
+                        english_name=str(
+                            record.get("english_name")
+                            or record.get("normalized_name")
+                            or record.get("korean_name")
+                            or ""
+                        ),
+                        image_url=image_url,
+                        reason=str(exc),
+                    )
+                )
 
     return result
 
@@ -134,9 +193,7 @@ def build_image_mapping(
     perfume_detail_id_resolver: PerfumeDetailIdResolver | None = None,
 ) -> PerfumeImageMapping:
     perfume_detail_id = (
-        perfume_detail_id_resolver(record)
-        if perfume_detail_id_resolver is not None
-        else record.get("perfume_detail_id")
+        resolve_perfume_detail_id(record, perfume_detail_id_resolver)
     )
     return PerfumeImageMapping(
         perfume_detail_id=perfume_detail_id,
@@ -144,6 +201,15 @@ def build_image_mapping(
         processed_path=image_path.as_posix(),
         updated_at=clock(),
     )
+
+
+def resolve_perfume_detail_id(
+    record: dict[str, Any],
+    perfume_detail_id_resolver: PerfumeDetailIdResolver | None = None,
+) -> Any:
+    if perfume_detail_id_resolver is not None:
+        return perfume_detail_id_resolver(record)
+    return record.get("perfume_detail_id")
 
 
 def slugify(value: object) -> str:

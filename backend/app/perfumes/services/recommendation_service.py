@@ -45,10 +45,18 @@ class RecommendationService:
         
         # [Step 1] 1차 필터링: 메인 계열 기반 후보군 추출 (DB 최적화)
         # TODO: 향후 이 단계를 Pinecone 벡터 검색(Semantic Search)으로 교체 예정
-        candidates = Perfume.objects.filter(family=main_family).select_related('brand', 'detail')[:100]
+        candidates = (
+            Perfume.objects.filter(family=main_family)
+            .select_related('brand', 'detail')
+            .prefetch_related('detail__images')[:100]
+        )
         
         if candidates.count() < 20:
-            candidates = Perfume.objects.all().select_related('brand', 'detail')[:100]
+            candidates = (
+                Perfume.objects.all()
+                .select_related('brand', 'detail')
+                .prefetch_related('detail__images')[:100]
+            )
 
         # 사용자 아우라 벡터화
         user_aura_vector = np.array([user_aura_dict.get(a, 0.2) for a in self.axes])
@@ -86,6 +94,7 @@ class RecommendationService:
             
             # 원화 환산 가격 계산 (정렬용)
             price_krw = self._convert_to_krw(p_data.get("price"))
+            image_asset = self._image_asset_for(p)
             
             ranked_results.append({
                 "id": p.id,
@@ -94,7 +103,8 @@ class RecommendationService:
                 "price": p_data.get("price", {}).get("raw", "정보없음"),
                 "price_krw": price_krw,
                 "size": p_data.get("volume", "N/A"),
-                "image": p_data.get("image_url", ""),
+                "image": image_asset.get("backend_path") or image_asset.get("original_url") or p_data.get("image_url", ""),
+                "imageAsset": image_asset,
                 "tags": p_data.get("accords", [])[:3],
                 "notes": ", ".join((p_data.get("representative_notes") or p_data.get("notes", []))[:5]),
                 "family": p.family,
@@ -133,6 +143,21 @@ class RecommendationService:
         max_s = max(scores.values()) if scores.values() else 0
         if max_s == 0: return {a: 0.2 for a in self.axes}
         return {k: round(v / max_s, 2) for k, v in scores.items()}
+
+    def _image_asset_for(self, perfume):
+        detail = getattr(perfume, "detail", None)
+        if detail is None:
+            return {}
+
+        image = next(iter(detail.images.all()), None)
+        if image is None:
+            return {}
+
+        return {
+            "original_url": image.original_url,
+            "backend_path": image.processed_path,
+            "base64": image.base64_data,
+        }
 
     def _generate_reason(self, matches, main_family):
         """사용자에게 보여줄 매칭 사유 문구를 생성합니다."""

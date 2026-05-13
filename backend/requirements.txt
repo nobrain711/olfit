@@ -20,6 +20,7 @@ pytest-django>=4.9.0
 
 # Olfit Specific Dependencies
 requests>=2.32.3
+scrapling[fetchers]>=0.4.8
 numpy>=1.26.0
 scikit-learn>=1.4.0
 openai>=1.12.0

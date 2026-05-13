@@ -56,7 +56,6 @@ class PerfumeRawData(models.Model):
     """
     perfume = models.OneToOneField(Perfume, on_delete=models.CASCADE, related_name='raw_data', help_text="향수 참조")
     raw_json = models.JSONField(default=dict, help_text="변형 전 원본 향수 JSON 문서")
-    source_url = models.CharField(max_length=500, blank=True, null=True, help_text="원본 페이지 URL")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -70,6 +69,7 @@ class PerfumeImage(models.Model):
     perfume_detail = models.ForeignKey(PerfumeDetail, on_delete=models.CASCADE, related_name='images', help_text="향수 상세 참조")
     original_url = models.CharField(max_length=500, help_text="원본 이미지 URL")
     processed_path = models.CharField(max_length=500, blank=True, help_text="다운로드 또는 처리된 이미지 경로")
+    base64_data = models.TextField(blank=True, help_text="다운로드된 이미지의 Base64 인코딩 값")
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

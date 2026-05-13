@@ -51,12 +51,12 @@ if is_enabled "${BACKEND_VERIFY_DB_SCHEMA:-true}"; then
   verify_db_schema
 fi
 
-if is_enabled "${PERFUME_IMAGE_SYNC_ON_STARTUP:-true}"; then
-  python "$MANAGE_PY" extract_perfume_images
-fi
-
 if is_enabled "${LOAD_PERFUMES_ON_STARTUP:-true}"; then
   python "$MANAGE_PY" load_perfumes
+fi
+
+if is_enabled "${PERFUME_IMAGE_SYNC_ON_STARTUP:-true}"; then
+  python "$MANAGE_PY" extract_perfume_images
 fi
 
 if [ "$#" -gt 0 ]; then

@@ -1,3 +1,7 @@
+import base64
+import os
+from pathlib import Path
+
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
@@ -30,12 +34,8 @@ class Command(BaseCommand):
         for image in result.images:
             if not image.perfume_detail_id:
                 continue
-            PerfumeImage.objects.update_or_create(
-                perfume_detail_id=image.perfume_detail_id,
-                original_url=image.original_url,
-                defaults={"processed_path": image.processed_path},
-            )
-            synced += 1
+            if sync_image_to_database(image):
+                synced += 1
 
         self.stdout.write(
             self.style.SUCCESS(
@@ -44,6 +44,14 @@ class Command(BaseCommand):
                 f"{result.failed} failed, {synced} synced."
             )
         )
+        for failure in result.failures[:20]:
+            self.stdout.write(
+                self.style.WARNING(
+                    "Image download failed: "
+                    f"{failure.brand} / {failure.english_name} / "
+                    f"{failure.image_url} / {failure.reason}"
+                )
+            )
 
 
 def resolve_perfume_detail_id(record):
@@ -66,3 +74,30 @@ def resolve_perfume_detail_id(record):
 
     detail = getattr(perfume, "detail", None)
     return getattr(detail, "id", None)
+
+
+def sync_image_to_database(image):
+    base64_data = ""
+    if image.processed_path and is_enabled(os.getenv("PERFUME_IMAGE_STORE_BASE64", "true")):
+        base64_data = encode_file_to_base64(image.processed_path)
+
+    PerfumeImage.objects.update_or_create(
+        perfume_detail_id=image.perfume_detail_id,
+        original_url=image.original_url,
+        defaults={
+            "processed_path": image.processed_path,
+            "base64_data": base64_data,
+        },
+    )
+
+    return True
+
+
+def encode_file_to_base64(path):
+    return base64.b64encode(Path(path).read_bytes()).decode("ascii")
+
+
+def is_enabled(value):
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in {"1", "true", "yes", "on"}
