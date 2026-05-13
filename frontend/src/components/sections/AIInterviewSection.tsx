@@ -27,7 +27,7 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
   const [lastProcessedBase64, setLastProcessedBase64] = useState<string | null>(null);
   const base64Ref = useRef<string | null>(null);
   const hasCalledAPIRef = useRef(false);
-  
+
   const getSteps = () => [
     { threshold: 10, text: "이미지 픽셀 데이터 추출 중..." },
     { threshold: 30, text: "스타일 실루엣 및 텍스처 분석..." },
@@ -60,14 +60,14 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
 
   const handleImageProcessed = (base64: string) => {
     if (isLoading) return; // 🚨 FIX: POST 중복 요청 방지
-    
+
     base64Ref.current = base64;
     hasCalledAPIRef.current = false;
     setLastProcessedBase64(base64);
     setLoading(true);
     setError(null);
     setProgress(0);
-    
+
     const analysisSteps = getSteps();
     const duration = 5000; // 시뮬레이션 5초
     const interval = 100;
@@ -114,9 +114,9 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
           <div className="max-w-2xl mx-auto">
             {error ? (
               // 🛠️ REFACTOR (UX 안정성): ErrorFallback에 구체적인 가이드 메시지 전달
-              <ErrorFallback 
-                message={`${error} \n서버 연결이 원활하지 않을 수 있습니다. 잠시 후 다시 시도해 주세요.`} 
-                onRetry={handleRetry} 
+              <ErrorFallback
+                message={`${error} \n서버 연결이 원활하지 않을 수 있습니다. 잠시 후 다시 시도해 주세요.`}
+                onRetry={handleRetry}
               />
             ) : !isComplete ? (
               <div className="relative">
@@ -130,13 +130,13 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
                         <span className="text-[10px] font-mono text-cream/60">{Math.round(progress)}%</span>
                       </div>
                       <div className="h-[2px] bg-cream/5 w-full relative overflow-hidden">
-                        <div 
-                          className="absolute inset-y-0 left-0 bg-cream/40 transition-all duration-300 ease-out shadow-[0_0_8px_rgba(253,252,240,0.3)]" 
-                          style={{ width: `${progress}%` }} 
+                        <div
+                          className="absolute inset-y-0 left-0 bg-cream/40 transition-all duration-300 ease-out shadow-[0_0_8px_rgba(253,252,240,0.3)]"
+                          style={{ width: `${progress}%` }}
                         />
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 gap-6">
                       <div className="p-8 border border-cream/5 bg-white/[0.02] rounded-sm backdrop-blur-sm relative overflow-hidden">
                         <div className="flex items-center gap-4">
@@ -157,8 +157,8 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
                 <div className="w-20 h-20 rounded-full bg-cream/10 flex items-center justify-center mb-8 border border-cream/20">
                   <CheckCircle2 className="text-cream w-10 h-10" strokeWidth={1} />
                 </div>
-                <a 
-                  href="#report" 
+                <a
+                  href="#report"
                   onClick={(e) => { e.stopPropagation(); }} // 🚨 FIX: POST 중복 요청 방지
                   className="group flex items-center gap-3 bg-cream text-wood px-10 py-4 text-[12px] font-medium uppercase tracking-[0.2em] transition-all duration-300 hover:bg-white active:scale-95"
                 >
