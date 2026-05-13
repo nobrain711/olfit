@@ -45,10 +45,10 @@ class RecommendationService:
         
         # [Step 1] 1차 필터링: 메인 계열 기반 후보군 추출 (DB 최적화)
         # TODO: 향후 이 단계를 Pinecone 벡터 검색(Semantic Search)으로 교체 예정
-        candidates = Perfume.objects.filter(family=main_family).select_related('brand')[:100]
+        candidates = Perfume.objects.filter(family=main_family).select_related('brand', 'detail')[:100]
         
         if candidates.count() < 20:
-            candidates = Perfume.objects.all().select_related('brand')[:100]
+            candidates = Perfume.objects.all().select_related('brand', 'detail')[:100]
 
         # 사용자 아우라 벡터화
         user_aura_vector = np.array([user_aura_dict.get(a, 0.2) for a in self.axes])
@@ -62,8 +62,8 @@ class RecommendationService:
         
         ranked_results = []
         for p in candidates:
-            # DB JSON 필드에서 상세 정보 및 사전 계산된 아우라 로드
-            p_data = p.data
+            # 상세 테이블 JSON 필드에서 사전 계산된 아우라 로드
+            p_data = getattr(getattr(p, "detail", None), "data", {}) or {}
             p_aura = p_data.get('aura_profile')
             
             if not p_aura:
