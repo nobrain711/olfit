@@ -19,7 +19,8 @@ RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
 COPY docker-entrypoint.sh ./docker-entrypoint.sh
-RUN chmod +x ./docker-entrypoint.sh
+RUN sed -i 's/\r$//' ./docker-entrypoint.sh && \
+    chmod +x ./docker-entrypoint.sh
 
 COPY app ./app
 
