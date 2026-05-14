@@ -12,6 +12,8 @@
   - [Recommendation API Contract](./backend/recommendation-api-contract.md)
   - [Vector RAG](./backend/vector-rag.md)
 - [Frontend](./frontend/info.md)
+  - [Image Upload Tests](./frontend/image-upload-tests.md)
+  - [Image Upload Troubleshooting](./frontend/image-upload-troubleshooting.md)
   - [JavaScript vs TypeScript](./frontend/presentation/01_JS_vs_TS.md)
   - [React Overview](./frontend/presentation/02_React_Overview.md)
   - [CSS and Tailwind](./frontend/presentation/03_CSS_and_Tailwind.md)
