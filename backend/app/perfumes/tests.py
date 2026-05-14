@@ -530,6 +530,11 @@ class RecommendationServiceTest(TestCase):
         )
         self.assertEqual(recommendation["imageDetail"]["base64"], "base64-image")
         self.assertEqual(recommendation["image"], "/static/perfumes/images/bvlgari/omnia.jpg")
+        self.assertEqual(
+            recommendation["imageUrl"],
+            "http://localhost:8000/static/perfumes/images/bvlgari/omnia.jpg",
+        )
+        self.assertEqual(recommendation["imageBase64"], "base64-image")
 
     def test_recommendations_split_flat_notes_when_parsed_notes_are_missing(self):
         brand = Brand.objects.create(name="LE LABO")

@@ -44,12 +44,14 @@ class RecommendationService:
 
         # [Step 1] 1차 필터링: 메인 계열 기반 후보군 추출 (DB 최적화)
         # TODO: 향후 이 단계를 Pinecone 벡터 검색(Semantic Search)으로 교체 예정
-        candidates = Perfume.objects.filter(family=main_family).select_related("brand")[
-            :100
-        ]
+        candidates = Perfume.objects.filter(family=main_family).select_related(
+            "brand", "detail"
+        ).prefetch_related("detail__images")[:100]
 
         if candidates.count() < 20:
-            candidates = Perfume.objects.all().select_related("brand")[:100]
+            candidates = Perfume.objects.all().select_related(
+                "brand", "detail"
+            ).prefetch_related("detail__images")[:100]
 
         # 사용자 아우라 벡터화
         user_aura_vector = np.array([user_aura_dict.get(a, 0.2) for a in self.axes])
@@ -68,7 +70,8 @@ class RecommendationService:
         ranked_results = []
         for p in candidates:
             # DB JSON 필드에서 상세 정보 및 사전 계산된 아우라 로드
-            p_data = p.data
+            detail = getattr(p, "detail", None)
+            p_data = getattr(detail, "data", {}) or {}
             p_aura = p_data.get("aura_profile")
 
             if not p_aura:
@@ -91,6 +94,12 @@ class RecommendationService:
 
             # 원화 환산 가격 계산 (정렬용)
             price_krw = self._convert_to_krw(p_data.get("price"))
+            image_asset = self._image_asset_for(p)
+            image_detail = self._image_payload_for(image_asset)
+            image_url = image_detail.get("url") or image_detail.get("originalUrl", "")
+            absolute_image_url = self._absolute_image_url(image_url) or image_url
+            image_base64 = image_detail.get("base64", "")
+            notes_pyramid = self._notes_pyramid_for(p_data)
 
             ranked_results.append(
                 {
@@ -100,7 +109,12 @@ class RecommendationService:
                     "price": p_data.get("price", {}).get("raw", "정보없음"),
                     "price_krw": price_krw,
                     "size": p_data.get("volume", "N/A"),
-                    "image": p_data.get("image_url", ""),
+                    "image": image_url,
+                    "imageUrl": absolute_image_url,
+                    "imageBase64": image_base64,
+                    "perfume": self._detail_payload_for(p, p_data),
+                    "imageDetail": image_detail,
+                    "imageAsset": image_asset,
                     "tags": p_data.get("accords", [])[:3],
                     "notes": ", ".join(
                         (p_data.get("representative_notes") or p_data.get("notes", []))[
@@ -113,16 +127,12 @@ class RecommendationService:
                     "matchReason": self._generate_reason(matches, main_family),
                     "details": {
                         "story": p_data.get("description", ""),
-                        "topNotes": ", ".join(
-                            p_data.get("notes_parsed", {}).get("top", [])
+                        "topNotes": ", ".join(notes_pyramid.get("top", [])),
+                        "middleNotes": ", ".join(notes_pyramid.get("middle", [])),
+                        "baseNotes": ", ".join(notes_pyramid.get("base", [])),
+                        "bestFor": ", ".join(
+                            self._keyword_values(p_data.get("keywords", []))[:3]
                         ),
-                        "middleNotes": ", ".join(
-                            p_data.get("notes_parsed", {}).get("middle", [])
-                        ),
-                        "baseNotes": ", ".join(
-                            p_data.get("notes_parsed", {}).get("base", [])
-                        ),
-                        "bestFor": ", ".join(p_data.get("keywords", [])[:3]),
                     },
                 }
             )
@@ -206,6 +216,19 @@ class RecommendationService:
             "backendPath": backend_path,
             "base64": image_asset.get("base64", ""),
         }
+
+    def _absolute_image_url(self, path):
+        if not path:
+            return ""
+        if str(path).startswith(("http://", "https://")):
+            return path
+
+        public_base_url = (
+            os.getenv("BACKEND_PUBLIC_URL")
+            or os.getenv("VITE_API_URL")
+            or "http://localhost:8000"
+        ).rstrip("/")
+        return f"{public_base_url}/{str(path).lstrip('/')}"
 
     def _public_image_url(self, path):
         static_marker = "/static/"

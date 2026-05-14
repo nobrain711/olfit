@@ -110,6 +110,8 @@ class RecommendationSerializer(serializers.Serializer):
     price_krw = serializers.IntegerField(required=False)
     size = serializers.CharField()
     image = serializers.CharField(required=False, allow_blank=True)
+    imageUrl = serializers.CharField(required=False, allow_blank=True)
+    imageBase64 = serializers.CharField(required=False, allow_blank=True)
     perfume = RecommendationPerfumeSerializer()
     imageDetail = RecommendationImageDetailSerializer(required=False)
     imageAsset = serializers.DictField(required=False)
