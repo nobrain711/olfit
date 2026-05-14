@@ -15,7 +15,7 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from django.conf import settings
 from perfumes.models import Perfume
-from ..utils import load_preference_expansion, load_master_map
+from ..utils import load_user_preference_map, load_master_map
 
 
 class RecommendationService:
@@ -29,7 +29,8 @@ class RecommendationService:
         self.axes = ["플로럴", "우디", "오리엔탈", "프레시", "구르망"]
 
         # [Pricing] 오늘 기준 환율 설정 (정렬용)
-        self.exchange_rates = {"USD": 1380, "EUR": 1490, "GBP": 1730, "KRW": 1}
+        # 모두 '원'으로 환산
+        self.exchange_rates = {"USD": 1490, "EUR": 1747, "GBP": 2017, "KRW": 1}
 
     def recommend(self, user_aura_dict, query_text, selected_notes):
         """
@@ -54,11 +55,15 @@ class RecommendationService:
         # 사용자 아우라 벡터화
         user_aura_vector = np.array([user_aura_dict.get(a, 0.2) for a in self.axes])
 
-        # 취향 성분 확장 매핑 로드 (ex: '우드' 선택 시 '샌달우드', '시더우드' 등 매칭)
-        expansion_map = load_preference_expansion()
+        # 취향 성분 확장 매핑 로드 (ex: '장미' 선택 시 '로즈', '다마스크 로즈' 등 매칭)
+        pref_map = load_user_preference_map()
         target_notes = []
         for n in selected_notes:
-            target_notes.extend(expansion_map.get(n, [n]))
+            mapping = pref_map.get(n)
+            if mapping:
+                target_notes.extend(mapping.get("expansion", [n]))
+            else:
+                target_notes.append(n)
         target_notes = set(target_notes)
 
         ranked_results = []
