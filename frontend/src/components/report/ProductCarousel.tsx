@@ -52,7 +52,7 @@ const ProductCard = memo(({
       {/* 제품 이미지 및 유사도 배지 */}
       <div className="w-full md:w-1/2 aspect-square overflow-hidden bg-cream/50 rounded-sm relative">
         <img 
-          src={item.image} 
+          src={item.image || undefined} 
           alt={item.name} 
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
           loading="lazy"
