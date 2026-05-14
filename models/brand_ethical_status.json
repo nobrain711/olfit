@@ -1,0 +1,46 @@
+{
+  "LUSH": {
+    "Cruelty-Free": "Yes",
+    "Vegan": "Yes"
+  },
+  "GIORGIO ARMANI": {
+    "Cruelty-Free": "No",
+    "Vegan": "No"
+  },
+  "JO MALONE": {
+    "Cruelty-Free": "No",
+    "Vegan": "No"
+  },
+  "BVLGARI": {
+    "Cruelty-Free": "No",
+    "Vegan": "No"
+  },
+  "BYREDO": {
+    "Cruelty-Free": "No",
+    "Vegan": "uncertain"
+  },
+  "CHANEL": {
+    "Cruelty-Free": "No",
+    "Vegan": "No"
+  },
+  "DIOR": {
+    "Cruelty-Free": "No",
+    "Vegan": "No"
+  },
+  "LE LABO": {
+    "Cruelty-Free": "Yes",
+    "Vegan": "Yes"
+  },
+  "CREED": {
+    "Cruelty-Free": "Yes",
+    "Vegan": "No"
+  },
+  "MAISON FRANCIS KURKDJIAN": {
+    "Cruelty-Free": "Yes",
+    "Vegan": "No"
+  },
+  "GRANHAND": {
+    "Cruelty-Free": "Yes",
+    "Vegan": "Yes"
+  }
+}
