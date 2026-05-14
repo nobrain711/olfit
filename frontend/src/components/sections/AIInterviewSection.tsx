@@ -3,7 +3,7 @@
  * @description 사용자의 스타일(OOTD) 이미지를 분석하여 맞춤형 향기를 추천하기 위한 인터뷰 섹션입니다.
  */
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import { Sparkles, CheckCircle2 } from "lucide-react";
 import ImageUploader from "@/components/common/ImageUploader";
@@ -25,6 +25,8 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
   const [analysisStatus, setAnalysisStatus] = useState("");
   const [progress, setProgress] = useState(0);
   const [lastProcessedBase64, setLastProcessedBase64] = useState<string | null>(null);
+  const base64Ref = useRef<string | null>(null);
+  const hasCalledAPIRef = useRef(false);
   
   const getSteps = () => [
     { threshold: 10, text: "이미지 픽셀 데이터 추출 중..." },
@@ -34,9 +36,33 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
     { threshold: 90, text: "최적의 향기 아우라 생성 완료" },
   ];
 
+  useEffect(() => {
+    if (progress < 100) return;
+    if (isComplete) return;
+    if (!base64Ref.current) return;
+    if (hasCalledAPIRef.current) return;
+
+    hasCalledAPIRef.current = true;
+
+    requestAuraAnalysis(base64Ref.current, selectedNotes)
+      .then((realResults) => {
+        setLoading(false);
+        setIsComplete(true);
+        if (onComplete) onComplete(realResults);
+      })
+      .catch((err) => {
+        setLoading(false);
+        hasCalledAPIRef.current = false;
+        setError(err.message || "분석 중 오류가 발생했습니다.");
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [progress]);
+
   const handleImageProcessed = (base64: string) => {
     if (isLoading) return; // 🚨 FIX: POST 중복 요청 방지
     
+    base64Ref.current = base64;
+    hasCalledAPIRef.current = false;
     setLastProcessedBase64(base64);
     setLoading(true);
     setError(null);
@@ -55,21 +81,6 @@ export default function AIInterviewSection({ onComplete, selectedNotes = [] }: A
 
         if (next >= 100) {
           clearInterval(timer);
-          
-          // 실제 백엔드 분석 요청
-          requestAuraAnalysis(base64, selectedNotes)
-            .then((realResults) => {
-              setLoading(false);
-              setIsComplete(true);
-              if (onComplete) {
-                onComplete(realResults);
-              }
-            })
-            .catch((err) => {
-              setLoading(false);
-              setError(err.message || "분석 중 오류가 발생했습니다.");
-            });
-            
           return 100;
         }
         return next;
