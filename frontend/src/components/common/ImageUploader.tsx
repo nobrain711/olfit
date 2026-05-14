@@ -22,6 +22,22 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadProcessingRef = useRef(false);
+
+  const resetFileInput = () => {
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const releaseUploadLock = () => {
+    uploadProcessingRef.current = false;
+    setIsUploading(false);
+  };
+
+  const failUpload = (message: string) => {
+    setError(message);
+    releaseUploadLock();
+    resetFileInput();
+  };
 
   /**
    * 🛠️ REFACTOR (보안 강화): 파일의 바이너리 헤더(Magic Number)를 확인하여 
@@ -57,7 +73,9 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
    * 이미지 리사이징 및 클라우드 업로드 시뮬레이션
    */
   const processImage = async (file: File) => {
-    if (isUploading || isAnalyzing) return; // 🚨 FIX: POST 중복 요청 방지
+    if (uploadProcessingRef.current || isUploading || isAnalyzing) return; // 🚨 FIX: POST 중복 요청 방지
+
+    uploadProcessingRef.current = true;
     
     // 🛡️ SECURITY FIX: 허용된 이미지 MIME 타입 및 확장자 엄격 검사
     const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
@@ -65,21 +83,28 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
     const fileExtension = file.name.split(".").pop()?.toLowerCase();
 
     if (!allowedTypes.includes(file.type) || !fileExtension || !allowedExtensions.includes(fileExtension)) {
-      setError("JPG, PNG, WEBP 형식의 이미지만 업로드 가능합니다.");
+      failUpload("JPG, PNG, WEBP 형식의 이미지만 업로드 가능합니다.");
       return;
     }
 
     // 🛠️ REFACTOR (보안 강화): 바이너리 시그니처 검증으로 파일 위조 차단
-    const isValidSignature = await validateFileSignature(file);
+    let isValidSignature = false;
+    try {
+      isValidSignature = await validateFileSignature(file);
+    } catch {
+      failUpload("파일을 검증하는 중 오류가 발생했습니다.");
+      return;
+    }
+
     if (!isValidSignature) {
-      setError("유효하지 않은 이미지 파일입니다. 파일 내용이 손상되었거나 위조되었습니다.");
+      failUpload("유효하지 않은 이미지 파일입니다. 파일 내용이 손상되었거나 위조되었습니다.");
       return;
     }
 
     // 🛡️ SECURITY FIX: 파일 크기 제한 (10MB) 설정하여 Image Bomb 및 DOS 공격 방어
     const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
     if (file.size > MAX_FILE_SIZE) {
-      setError("파일 크기는 10MB 이하만 가능합니다.");
+      failUpload("파일 크기는 10MB 이하만 가능합니다.");
       return;
     }
 
@@ -88,13 +113,18 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
     const reader = new FileReader();
     
     reader.onload = async (event) => {
+      if (!event.target?.result || typeof event.target.result !== "string") {
+        failUpload("파일을 읽는 중 오류가 발생했습니다.");
+        return;
+      }
+
       const img = new Image();
       img.onload = async () => {
         try {
           // 🛡️ SECURITY FIX: 캔버스 크기 상한선 강제 적용 (비정상적으로 큰 이미지의 픽셀 공격 방어)
           const MAX_CANVAS_SIZE = 4096;
           if (img.width > MAX_CANVAS_SIZE || img.height > MAX_CANVAS_SIZE) {
-            setError("이미지 해상도가 너무 높습니다.");
+            failUpload("이미지 해상도가 너무 높습니다.");
             return;
           }
 
@@ -119,7 +149,10 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext("2d");
-          if (!ctx) return;
+          if (!ctx) {
+            failUpload("이미지 처리 중 오류가 발생했습니다.");
+            return;
+          }
           ctx.drawImage(img, 0, 0, width, height);
           
           const base64 = canvas.toDataURL("image/jpeg", 0.9);
@@ -129,25 +162,23 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
           setIsUploading(true);
           const remoteUrl = await uploadToCloudStorage(base64);
           setProcessedImage({ base64, remoteUrl });
-          setIsUploading(false); // 🚨 FIX: POST 중복 요청 방지
+          releaseUploadLock(); // 🚨 FIX: POST 중복 요청 방지
         } catch {
-          setError("이미지 처리 중 오류가 발생했습니다.");
-          setIsUploading(false);
+          failUpload("이미지 처리 중 오류가 발생했습니다.");
         }
       };
       
       // 🛡️ SECURITY FIX: onerror 핸들러 추가하여 이미지 로딩 실패 시 자원 해제
       img.onerror = () => {
-        setError("이미지를 불러올 수 없습니다. 파일이 손상되었거나 올바른 형식이 아닙니다.");
-        setIsUploading(false);
+        failUpload("이미지를 불러올 수 없습니다. 파일이 손상되었거나 올바른 형식이 아닙니다.");
       };
 
-      img.src = event.target?.result as string;
+      img.src = event.target.result;
     };
 
     // 🛡️ SECURITY FIX: FileReader 오류 핸들링 추가
     reader.onerror = () => {
-      setError("파일을 읽는 중 오류가 발생했습니다.");
+      failUpload("파일을 읽는 중 오류가 발생했습니다.");
     };
 
     reader.readAsDataURL(file);
@@ -185,9 +216,9 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
     e.stopPropagation();
     setPreview(null);
     setProcessedImage(null);
-    setIsUploading(false);
+    releaseUploadLock();
     setError(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    resetFileInput();
   };
 
   const startAnalysis = (e: React.MouseEvent) => {
