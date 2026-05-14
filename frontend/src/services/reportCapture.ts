@@ -245,54 +245,64 @@ export const captureReportBlob = async (reportElement: HTMLElement | null): Prom
   return Promise.race([captureProcess, overallTimeout]) as Promise<Blob | null>;
 };
 
+// 모듈 레벨 중복 호출 가드
+let _isSharing = false;
+
 /**
  * 생성된 이미지를 네이티브 공유, 클립보드 복사 또는 다운로드 방식으로 사용자에게 제공합니다.
  * 
  * @param blob 이미지 Blob
  */
 export const shareOrDownloadImage = async (blob: Blob): Promise<"shared" | "copied" | "downloaded" | "failed"> => {
-  const file = new File([blob], `Olfit_Analysis_${Date.now()}.png`, { type: "image/png" });
+  if (_isSharing) return "failed";
+  _isSharing = true;
 
-  // 1. 네이티브 공유 API (모바일 등)
-  if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+  try {
+    const file = new File([blob], `Olfit_Analysis_${Date.now()}.png`, { type: "image/png" });
+
+    // 1. 네이티브 공유 API (모바일 등)
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: "Olfit Scent Analysis Report",
+          text: "나만의 고유한 향기 아우라 분석 결과를 확인해보세요.",
+        });
+        return "shared";
+      } catch (shareErr) {
+        if ((shareErr as Error).name === "AbortError") return "failed";
+        console.warn("Share failed", shareErr);
+      }
+    }
+
+    // 2. 클립보드 복사
     try {
-      await navigator.share({
-        files: [file],
-        title: "Olfit Scent Analysis Report",
-        text: "나만의 고유한 향기 아우라 분석 결과를 확인해보세요.",
-      });
-      return "shared";
-    } catch (shareErr) {
-      if ((shareErr as Error).name === "AbortError") return "failed"; 
-      console.warn("Share failed", shareErr);
+      if (navigator.clipboard && window.ClipboardItem) {
+        const item = new ClipboardItem({ "image/png": blob });
+        await navigator.clipboard.write([item]);
+        return "copied";
+      }
+    } catch (clipboardErr) {
+      console.warn("Clipboard failed", clipboardErr);
     }
-  }
 
-  // 2. 클립보드 복사
-  try {
-    if (navigator.clipboard && window.ClipboardItem) {
-      const item = new ClipboardItem({ "image/png": blob });
-      await navigator.clipboard.write([item]);
-      return "copied";
+    // 3. 강제 다운로드
+    try {
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Olfit_Analysis_${Date.now()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => window.URL.revokeObjectURL(url), 100);
+      return "downloaded";
+    } catch (downloadErr) {
+      console.error("Download failed", downloadErr);
+      return "failed";
     }
-  } catch (clipboardErr) {
-    console.warn("Clipboard failed", clipboardErr);
-  }
-
-  // 3. 강제 다운로드
-  try {
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `Olfit_Analysis_${Date.now()}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    setTimeout(() => window.URL.revokeObjectURL(url), 100);
-    return "downloaded";
-  } catch (downloadErr) {
-    console.error("Download failed", downloadErr);
-    return "failed";
+  } finally {
+    _isSharing = false;
   }
 };
 

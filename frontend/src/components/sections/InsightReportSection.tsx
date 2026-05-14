@@ -23,7 +23,8 @@ interface InsightReportSectionProps {
 export default function InsightReportSection({ results, onProductClick }: InsightReportSectionProps) {
   // 🛠️ REFACTOR (유지보수성): 모든 비즈니스 로직과 상태를 useInsightReport 훅으로 위임
   const {
-    observers,
+    refs: { refHeader, refRadar, refSteps, refPyramid },
+    visibility: { visHeader, visRadar, visSteps, visPyramid },
     reportRef,
     state,
     derived,
@@ -44,9 +45,9 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
           </div>
         ) : (
           <>
-            <div ref={observers.refHeader}>
+            <div ref={refHeader}>
               <ReportHeader 
-                isVisible={observers.visHeader || !!results} 
+                isVisible={visHeader || !!results} 
                 isSaving={state.isSaving} 
                 feedback={state.feedback} 
                 onShare={actions.handleShareResults} 
@@ -54,9 +55,9 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
             </div>
 
             <div ref={reportRef} id="report-content" data-capture-target="true" className="p-4 md:p-8 rounded-lg bg-[#FDFCF0]">
-              <div ref={observers.refPyramid}>
+              <div ref={refPyramid}>
                 <ScentBlueprint 
-                  isVisible={observers.visPyramid || !!results} 
+                  isVisible={visPyramid || !!results} 
                   slots={derived.slots} 
                   matchPercent={derived.matchPercent} 
                   accentClass={theme.accent} 
@@ -71,12 +72,12 @@ export default function InsightReportSection({ results, onProductClick }: Insigh
                 </div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 mb-12">
-                  <div ref={observers.refRadar} className={`transition-all duration-800 delay-100 ${(observers.visRadar || !!results) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                  <div ref={refRadar} className={`transition-all duration-800 delay-100 ${(visRadar || !!results) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                     <RadarChart data={derived.currentRadarData} forceDraw={true} />
                   </div>
-                  <div ref={observers.refSteps}>
+                  <div ref={refSteps}>
                     <AuraAnalysisSteps 
-                      isVisible={observers.visSteps || !!results} 
+                      isVisible={visSteps || !!results} 
                       logicSteps={derived.dynamicLogicSteps} 
                       borderClass={theme.border} 
                     />

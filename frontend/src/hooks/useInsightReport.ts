@@ -89,12 +89,17 @@ export function useInsightReport(results: AnalysisResults | null) {
       e.preventDefault();
       e.stopPropagation();
     }
-    if (isCapturingRef.current) return;
+
+    if (isCapturingRef.current || isSaving) return;
+
     isCapturingRef.current = true;
     setIsSaving(true);
+    setFeedback(null);
+
     try {
       const blob = await captureReportBlob(reportRef.current);
       if (!blob) throw new Error("Blob creation failed");
+
       const result = await shareOrDownloadImage(blob);
       if (result === "copied") {
         setFeedback("이미지 복사 완료!");
@@ -112,7 +117,18 @@ export function useInsightReport(results: AnalysisResults | null) {
   };
 
   return {
-    observers: { refHeader, visHeader, refRadar, visRadar, refSteps, visSteps, refPyramid, visPyramid },
+    refs: {
+      refHeader,
+      refRadar,
+      refSteps,
+      refPyramid,
+    },
+    visibility: {
+      visHeader,
+      visRadar,
+      visSteps,
+      visPyramid,
+    },
     reportRef,
     state: { sortBy, isSaving, feedback },
     derived: { recommendations, slots, matchPercent, dynamicLogicSteps, currentRadarData },

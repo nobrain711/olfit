@@ -101,12 +101,12 @@ export default function HeroSection() {
                   Ingredient Discovery
                 </p>
                 <p className="text-[13px] sm:text-sm font-medium leading-snug text-cream break-keep">
-                  취향에 맞는 3가지 원료를 선택해 <br className="hidden sm:inline" /> 
-                  당신의 향을 발견하세요
+                  3가지 원료 선택과 AI 분석으로 <br className="hidden sm:inline" />
+                  당신만의 향기를 발견하세요
                 </p>
               </div>
               <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-cream/80 mt-2 group-hover:text-cream transition-colors">
-                <span>Explore Ingredients</span>
+                <span>Start Analysis</span>
                 <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
               </div>
             </div>

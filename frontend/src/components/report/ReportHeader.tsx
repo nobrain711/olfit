@@ -18,8 +18,13 @@ export default function ReportHeader({ isVisible, isSaving, feedback, onShare }:
       <div className="flex justify-center">
         <button 
           type="button"
-          onClick={onShare}
-          disabled={isSaving}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onShare();
+          }}
+          onDoubleClick={(e) => e.preventDefault()}
+          disabled={isSaving || !!feedback}
           className={`group flex items-center gap-3 px-8 py-3.5 border rounded-full text-[11px] sm:text-[12px] uppercase tracking-[0.2em] transition-all duration-300 ${
             isSaving 
               ? "bg-wood/5 text-wood/30 border-wood/10 cursor-not-allowed" 

@@ -249,7 +249,11 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
           {/* 업로드 중 상태 표시 */}
           {isUploading && (
             <div className="absolute inset-0 bg-gold/40 backdrop-blur-sm flex flex-col items-center justify-center text-wood">
-              <Loader2 className="w-8 h-8 animate-spin mb-4" />
+              <div className="flex items-center gap-1.5 mb-6">
+                <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse [animation-delay:-0.3s]" />
+                <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse [animation-delay:-0.15s]" />
+                <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+              </div>
               <p className="text-[13px] font-bold tracking-widest uppercase">Uploading to S3...</p>
               <p className="text-[11px] opacity-70 mt-2">안전한 서버로 이미지를 전송 중입니다</p>
             </div>
@@ -258,7 +262,11 @@ export default function ImageUploader({ onImageProcessed, isAnalyzing }: ImageUp
           {/* 분석 중 상태 표시 */}
           {isAnalyzing && (
             <div className="absolute inset-0 bg-wood/60 backdrop-blur-sm flex flex-col items-center justify-center text-cream">
-              <Loader2 className="w-8 h-8 animate-spin mb-4" />
+              <div className="flex items-center gap-1.5 mb-6">
+                <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse [animation-delay:-0.3s]" />
+                <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse [animation-delay:-0.15s]" />
+                <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+              </div>
               <p className="text-[13px] font-medium tracking-widest uppercase">Analyzing your style...</p>
               <p className="text-[11px] text-cream/60 mt-2">AI가 당신의 무드를 해석하고 있습니다</p>
             </div>
