@@ -9,6 +9,9 @@ django-environ>=0.13.0
 mysqlclient>=2.2.8
 cryptography>=42.0.0
 
+# Database - Vector
+pinecone >= 9.0.0
+
 # API - CORS
 django-cors-headers>=4.9.0
 

@@ -59,6 +59,10 @@ if is_enabled "${PERFUME_IMAGE_SYNC_ON_STARTUP:-true}"; then
   python "$MANAGE_PY" extract_perfume_images
 fi
 
+if is_enabled "${PINECONE_INDEX_ON_STARTUP:-true}"; then
+  python "$MANAGE_PY" index_to_pinecone --use-local-cache
+fi
+
 if [ "$#" -gt 0 ]; then
   exec "$@"
 fi
