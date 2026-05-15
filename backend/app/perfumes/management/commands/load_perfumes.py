@@ -273,7 +273,7 @@ def build_detail_data(item):
         if not meta:
             detail_data.pop("meta", None)
 
-            return detail_data
+    return detail_data
 
 
 # ----------------------------------------------------------------
