@@ -50,8 +50,14 @@ export default function ScentNoteCarousel({ onNotesChange }: ScentNoteCarouselPr
   }, [totalNotes]);
 
   const handleTabChange = (tab: "Top" | "Middle" | "Base") => {
+    const notesForTab = scentNotes.filter(n => n.category === tab);
+    const selectedNote = slots[tab];
+    const selectedIndex = selectedNote
+      ? notesForTab.findIndex(note => note.id === selectedNote.id)
+      : -1;
+
     setActiveTab(tab);
-    setCurrentIndex(0);
+    setCurrentIndex(selectedIndex >= 0 ? selectedIndex : 0);
   };
 
   const handleDotClick = (index: number) => {
