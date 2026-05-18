@@ -1,8 +1,8 @@
-# Tech Stack
+# 🧰 Tech Stack
 
 이 문서는 현재 저장소에 실제 적용된 기술 스택을 기준으로 정리한다. 예정된 확장 기술은 별도 섹션에 구분한다.
 
-## Runtime and Language
+## 🧪 Runtime and Language
 
 | Area | Stack | Usage |
 | --- | --- | --- |
@@ -10,7 +10,7 @@
 | Frontend language | TypeScript 5.9 | React 컴포넌트와 클라이언트 로직 작성 |
 | Frontend runtime | Node.js / Yarn | Vite 개발 서버와 프론트엔드 의존성 관리 |
 
-## Backend
+## 🖥️ Backend
 
 | Stack | Version / Package | Usage |
 | --- | --- | --- |
@@ -22,7 +22,7 @@
 | mysqlclient | `mysqlclient>=2.2.8` | Django와 MySQL 연결 |
 | pytest / pytest-django | `pytest>=8.0.0`, `pytest-django>=4.9.0` | 백엔드 테스트 |
 
-## AI and Recommendation
+## 🧠 AI and Recommendation
 
 | Stack | Version / Package | Usage |
 | --- | --- | --- |
@@ -34,7 +34,7 @@
 
 현재 추천 로직은 MySQL에서 후보 향수를 조회한 뒤, Python 서비스 레이어에서 아우라 벡터와 취향 노트를 기반으로 재정렬한다.
 
-## Frontend
+## 🎨 Frontend
 
 | Stack | Version / Package | Usage |
 | --- | --- | --- |
@@ -47,7 +47,7 @@
 | html2canvas | `html2canvas^1.4.1` | 분석 리포트 이미지 캡처 |
 | Embla Carousel | `embla-carousel-react^8.6.0` | 캐러셀 UI |
 
-## UI and Styling
+## ✨ UI and Styling
 
 | Stack | Version / Package | Usage |
 | --- | --- | --- |
@@ -59,7 +59,7 @@
 | clsx / tailwind-merge | `clsx^2.1.1`, `tailwind-merge^3.4.0` | 조건부 클래스 병합 |
 | tailwindcss-animate / tw-animate-css | `tailwindcss-animate^1.0.7`, `tw-animate-css^1.4.0` | 애니메이션 유틸리티 |
 
-## Database
+## 🗄️ Database
 
 | Stack | Version / Config | Usage |
 | --- | --- | --- |
@@ -71,7 +71,7 @@
 
 현재 운영 모델은 RDB 중심이다. `Brand`, `Perfume`의 식별과 필터링 필드는 정규 컬럼으로 관리하고, 향수 상세 정보는 JSON 컬럼에 보관한다.
 
-## Infrastructure
+## ⚙️ Infrastructure
 
 | Stack | Usage |
 | --- | --- |
@@ -82,7 +82,7 @@
 | Healthcheck | MySQL 준비 상태 확인 후 백엔드 기동 |
 | JSON file logging | 컨테이너 로그 크기와 보관 개수 제한 |
 
-## Documentation and CI
+## 📚 Documentation and CI
 
 | Stack | Usage |
 | --- | --- |
@@ -90,7 +90,7 @@
 | GitHub Actions | mdBook 배포와 코드 리뷰 자동화 워크플로 |
 | Conventional Commits | scope 기반 변경 이력 관리 |
 
-## Planned Extensions
+## 🚀 Planned Extensions
 
 | Stack | Status | Purpose |
 | --- | --- | --- |
